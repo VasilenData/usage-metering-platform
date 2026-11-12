@@ -5,7 +5,7 @@ import json
 import re
 from datetime import UTC, datetime
 
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"
 
 
 def timestamp(value):
@@ -36,12 +36,34 @@ def month_bounds(month):
     return start, end
 
 
-def rate(events, prices, *, tenant_id, month):
+def rate(events, prices, *, tenant_id, month, known_at=None, engine_version=None):
     """One line per event; corrections use the original event's effective time.
 
     Input is a database-consistent, known-at snapshot. This function independently
     verifies identity, ownership, correction bounds and complete price coverage.
     """
+    version = engine_version or ENGINE_VERSION
+    if version not in {"1.0.0", ENGINE_VERSION}:
+        raise ValueError("Unsupported rating engine version")
+    # Validate ownership before any cutoff can hide a cross-tenant record.
+    if any(row["tenant_id"] != tenant_id for row in [*events, *prices]):
+        raise ValueError("Mixed tenant snapshot")
+    if known_at is not None:
+        if version != "1.0.0":
+            for rows, field in ((events, "received_at"), (prices, "recorded_at")):
+                for row in rows:
+                    if field not in row:
+                        raise ValueError(f"Known-at rating requires {field} on every source record")
+                    try:
+                        timestamp(row[field])
+                    except (AttributeError, TypeError, ValueError) as exc:
+                        raise ValueError(f"Known-at rating requires a valid timezone-aware {field}") from exc
+        cutoff = timestamp(known_at)
+        events = [e for e in events if "received_at" not in e or timestamp(e["received_at"]) <= cutoff]
+        prices = [p for p in prices if "recorded_at" not in p or timestamp(p["recorded_at"]) <= cutoff]
+    if version == "1.0.0":
+        # Pre-clock statements fingerprinted the original four price columns.
+        prices = [{key: value for key, value in p.items() if key != "recorded_at"} for p in prices]
     start, end = month_bounds(month)
     ordered_prices = sorted(prices, key=lambda p: timestamp(p["effective_from"]))
     if len({timestamp(p["effective_from"]) for p in ordered_prices}) != len(ordered_prices):
@@ -100,7 +122,7 @@ def rate(events, prices, *, tenant_id, month):
     if any(value < 0 for value in balances.values()):
         raise ValueError("Corrections cannot make original usage negative")
     result = {
-        "engine_version": ENGINE_VERSION,
+        "engine_version": version,
         "tenant_id": tenant_id,
         "month": month,
         "currency": "USD",

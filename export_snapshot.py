@@ -57,11 +57,20 @@ def verify(directory):
     regenerated = build_report(source["product_events"], tenant_id="demo", as_of=source["as_of"])
     assert equivalent(regenerated, data["analytics"]), "Product snapshot does not reproduce"
     for document in data["statements"]:
-        cutoff = timestamp(document["created_at"])
+        cutoff = timestamp(document.get("known_at", document["created_at"]))
         known = [row for row in source["usage_events"] if timestamp(row["received_at"]) <= cutoff]
-        expected = rate(known, source["prices"], tenant_id="demo", month=document["month"])
+        expected = rate(
+            known,
+            source["prices"],
+            tenant_id="demo",
+            month=document["month"],
+            known_at=cutoff,
+            engine_version=document["engine_version"],
+        )
         actual = {
-            key: value for key, value in document.items() if key not in ("id", "revision", "created_at")
+            key: value
+            for key, value in document.items()
+            if key not in ("id", "revision", "created_at", "known_at")
         }
         assert expected == actual, f"Statement revision {document['revision']} does not reproduce"
     assert data["metering"]["total_units"] == sum(row["units"] for row in source["usage_events"])

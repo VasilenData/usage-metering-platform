@@ -122,6 +122,39 @@ class Store:
                 (hashlib.sha256(token.encode()).hexdigest(),),
             ).fetchone()
 
+    def provision_price(self, tenant_id, *, price_id, effective_from, unit_price_microusd):
+        """Administrative, append-only price version; not exposed by the API.
+
+        The tenant lock serializes publication with the server-assigned receipt
+        clock. Backdated effective dates revise only newly published statements.
+        """
+        effective = timestamp(effective_from)
+        if not isinstance(price_id, str) or not price_id or len(price_id) > 96:
+            raise ValueError("price_id must contain 1 to 96 characters")
+        if type(unit_price_microusd) is not int or not 0 <= unit_price_microusd <= 10**12:
+            raise ValueError("Price must be an integer from 0 to 1,000,000,000,000 microUSD")
+        with self.admin() as conn:
+            conn.execute("SET LOCAL statement_timeout = '5s'")
+            conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (tenant_id,))
+            if not conn.execute("SELECT 1 FROM tenants WHERE id=%s", (tenant_id,)).fetchone():
+                raise ValueError("Unknown tenant")
+            old = conn.execute(
+                "SELECT * FROM prices WHERE tenant_id=%s AND id=%s", (tenant_id, price_id)
+            ).fetchone()
+            if old:
+                if old["effective_from"] == effective and old["unit_price_microusd"] == unit_price_microusd:
+                    return old
+                raise Conflict("Price identity reused with different content")
+            if conn.execute(
+                "SELECT 1 FROM prices WHERE tenant_id=%s AND effective_from=%s", (tenant_id, effective)
+            ).fetchone():
+                raise Conflict("Price effective boundary already exists")
+            return conn.execute(
+                "INSERT INTO prices(tenant_id,id,effective_from,unit_price_microusd) "
+                "VALUES(%s,%s,%s,%s) RETURNING *",
+                (tenant_id, price_id, effective, unit_price_microusd),
+            ).fetchone()
+
     def describe(self, tenant_id):
         with self.admin() as conn:
             return conn.execute(
@@ -235,9 +268,10 @@ class Store:
 
     def publish(self, tenant_id, month, *, before_commit=None):
         with self.tenant(tenant_id) as conn:
+            known_at = conn.execute("SELECT clock_timestamp() AS cutoff").fetchone()["cutoff"]
             events = conn.execute("SELECT * FROM usage_events ORDER BY source,id").fetchall()
             prices = conn.execute("SELECT * FROM prices ORDER BY effective_from").fetchall()
-            result = rate(events, prices, tenant_id=tenant_id, month=month)
+            result = rate(events, prices, tenant_id=tenant_id, month=month, known_at=known_at)
             old = conn.execute(
                 "SELECT document FROM statements WHERE month=%s AND content_sha256=%s",
                 (month, result["content_sha256"]),
@@ -247,7 +281,12 @@ class Store:
             revision = conn.execute(
                 "SELECT coalesce(max(revision),0)+1 AS revision FROM statements WHERE month=%s", (month,)
             ).fetchone()["revision"]
-            result.update(id=str(uuid.uuid4()), revision=revision, created_at=datetime.now(UTC).isoformat())
+            result.update(
+                id=str(uuid.uuid4()),
+                revision=revision,
+                created_at=known_at.isoformat(),
+                known_at=known_at.isoformat(),
+            )
             conn.execute(
                 "INSERT INTO statements(tenant_id,id,month,revision,document,content_sha256) VALUES(%s,%s,%s,%s,%s,%s)",
                 (tenant_id, result["id"], month, revision, Jsonb(result), result["content_sha256"]),
