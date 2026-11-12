@@ -60,6 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
       pages: write
       id-token: write
     environment:
@@ -74,6 +75,43 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Wait for this attempt's artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGES_ARTIFACT: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          python3 - <<'PY'
+          import json, os, time, urllib.error, urllib.request
+          endpoint = (f"{os.environ['GITHUB_API_URL']}/repos/{os.environ['GITHUB_REPOSITORY']}"
+                      f"/actions/runs/{os.environ['GITHUB_RUN_ID']}/artifacts?per_page=100")
+          request = urllib.request.Request(endpoint, headers={
+              'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+              'Accept': 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28',
+          })
+          for attempt in range(12):
+              try:
+                  with urllib.request.urlopen(request, timeout=10) as response:
+                      artifacts = json.load(response)['artifacts']
+                  matching = [item for item in artifacts
+                              if item['name'] == os.environ['PAGES_ARTIFACT'] and not item['expired']]
+                  if len(matching) == 1:
+                      print('This attempt has one available Pages artifact.')
+                      break
+                  if len(matching) > 1:
+                      raise SystemExit('Ambiguous Pages artifact; refusing deployment.')
+              except urllib.error.HTTPError as error:
+                  if error.code not in (429, 500, 502, 503, 504):
+                      raise
+              except (urllib.error.URLError, TimeoutError):
+                  pass
+              if attempt == 11:
+                  raise SystemExit('Pages artifact metadata did not become available in the bounded window.')
+              time.sleep(5)
+          PY
       - name: Deploy read-only synthetic snapshot
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
