@@ -1,0 +1,127 @@
+{
+  "recorded_at": "2026-11-12T18:53:43.343594+00:00",
+  "scope": "synthetic controlled local PostgreSQL exercise",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.14",
+  "checks": [
+    {
+      "name": "Idempotent replay",
+      "passed": true,
+      "detail": "Five retries accepted as duplicates"
+    },
+    {
+      "name": "No second charge",
+      "passed": true,
+      "detail": "100 units \u00d7 250 \u03bcUSD; same immutable statement"
+    },
+    {
+      "name": "Original preserved",
+      "passed": true,
+      "detail": "Revision 1 remains byte-equivalent as a JSON document"
+    },
+    {
+      "name": "Late usage and correction reconciled",
+      "passed": true,
+      "detail": "(100 + 40 \u2212 20) \u00d7 250 \u03bcUSD = 30,000 \u03bcUSD"
+    },
+    {
+      "name": "New revision published",
+      "passed": true,
+      "detail": "No mutation of the previously published statement"
+    },
+    {
+      "name": "Effective-time pricing",
+      "passed": true,
+      "detail": "100 \u00d7 250 + 100 \u00d7 200 = 45,000 \u03bcUSD"
+    },
+    {
+      "name": "Two price versions traceable",
+      "passed": true,
+      "detail": "Boundary is inclusive for the new price"
+    },
+    {
+      "name": "Cross-account query denied by RLS",
+      "passed": true,
+      "detail": "Direct SQL for the seeded demo returns no rows from this sandbox"
+    },
+    {
+      "name": "Restricted runtime identity",
+      "passed": true,
+      "detail": "Runtime is neither superuser nor BYPASSRLS"
+    },
+    {
+      "name": "Observed real uncommitted INSERT",
+      "passed": true,
+      "detail": "Subprocess signalled its transaction boundary before termination"
+    },
+    {
+      "name": "Abrupt client death preserved published statement",
+      "passed": true,
+      "detail": "Killed the Python publisher after INSERT; PostgreSQL rolled back the disconnected transaction"
+    },
+    {
+      "name": "Retry after abrupt death reconciles",
+      "passed": true,
+      "detail": "Two committed versions; no partial or phantom revision"
+    },
+    {
+      "name": "Concurrent load conservation",
+      "passed": true,
+      "detail": "200 unique events; units 1..200; independent arithmetic total 20,100"
+    },
+    {
+      "name": "Backup restoration preserves ledger and statements",
+      "passed": true,
+      "detail": "All fixture tenants' usage, pricing, product events and statements match after pg_dump restoration"
+    },
+    {
+      "name": "Restored RLS still hides other accounts",
+      "passed": true,
+      "detail": "Restored database queried with restricted runtime identity"
+    }
+  ],
+  "client_crash_recovery_seconds": 0.065656,
+  "load": {
+    "events": 200,
+    "concurrency": 8,
+    "end_to_end_seconds": 1.48122,
+    "observed_events_per_second": 135.024,
+    "p50_seconds": 0.037493,
+    "p95_seconds": 0.145547,
+    "scope": "local client + database; one tenant serialized by design; includes connection setup"
+  },
+  "backup_restore": {
+    "seconds": 1.159178,
+    "archive_bytes": 42725,
+    "archive_sha256": "f73010a3731a14ea9768da0b08dcad237d4290bf173b1e2830bc310f3fe60c19",
+    "snapshot_sha256": "20c959a8f03c94cbf7a6dba53bc49f2730bc6954c2ede397a7fbde9578436b6c",
+    "tenants_reconciled": 11,
+    "scope": "entire disposable test database; synthetic data"
+  },
+  "postgresql": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+  "source_files": {
+    "analytics.py": "ea1e05225b5a63a13c2f68c17fcc211ee2bf8704b8baa0bd3a4a7b765eb49a2d",
+    "app.py": "c0b4b022b92b551744e5dec969271698287c893fec29ad9f11a8275526ba3687",
+    "billing.py": "32f05fce538e288c61a838a748c580943ad8a4aa460d12743eb3aa69b14bc373",
+    "demo.py": "0c7fe8d1dffbb068f6138bb896306843bf27fc227b1bc86fa50a2461be6cd091",
+    "export_snapshot.py": "032c084c3a4b34d00d297b98efdd968e13493b8576db430589121eb90e31e206",
+    "requirements.txt": "c46402cb9cce4e53643c99f8875f51163d91f9dafb0e796cd3079906de5761a6",
+    "schema.sql": "4b7f94159cef64c587560c35de2041c1cb410cb94fc6e25180a81bfb718643bc",
+    "store.py": "54fb597654d321e22db178347608d826e3ae9bf5ced9b7a74d922429a0461715",
+    "tests/test_analytics.py": "0de36f1d4746f07eadb6370c6840ebbadd3816149247dc9ed5c645e83d24ebad",
+    "tests/test_billing.py": "6dfac10d5315cf74650b75129ec8d31d85ea64a93b16ced2afeaee92b5f333a4",
+    "tests/test_http_extra.py": "fa5911277f3282ae1c244304a22f62d04153ac83ddf194c999372e5d89732893",
+    "tests/test_postgres.py": "e0048c91f03696106f11b5bb09e1b359509ea5b9eb85cdbf2e170f53723b163e",
+    "tests/test_sdk.mjs": "3991f9bed0aaa4101a770edd70ae6ab3aeeb8659260f83a80e444458d12229d5",
+    "tests/test_snapshot.py": "f67b1b7881974cafc06fe147fe6e498123c810bf2414051ccf919e5e0b471d70",
+    "verify_release.py": "2671419a9bc733130bee162dca0181e5bcb713eeebbc646863f430584f9ac665",
+    "web/app.js": "244d4069c54a5899b85b8e0fdb180beb5120e53e7bb8623818dbecd70eb34168",
+    "web/demo.json": "261cacf32478810cf14690550a528c1f5dca1da7a858881b77b2356cd42483f8",
+    "web/index.html": "c782f26da5762ad61e94ac21980c770ede866ddbc0705df70ad0ba974b318b73",
+    "web/package.json": "a90fc33418afa2b9cbf4768524b021135b965ecdf993457505bfae3ac44a8428",
+    "web/README.md": "ad9dc40f2784adc326d698a69454ea40c895027bbb074a030f59efc337a26cbc",
+    "web/sdk.js": "fa93fbb91cdb3b8b61f6a37704f161d79556dd790de766d7a264c1633bf5a41e",
+    "web/sources.json": "04e0df1b5f663d152e0a71feb0d5ac7ae3cc8dfde66f1ca65b1c07019f86ada7",
+    "web/styles.css": "1bae6123dbc528235fbe47a7dc1741ea71774c7acd6301726c601e6bb9e0c797"
+  }
+}
