@@ -10,6 +10,22 @@ Units and prices use integers. Prices are micro-US dollars per unit (1 USD = 1,0
 
 Corrections are append-only signed deltas referencing an original in the same tenant and source. They must preserve its occurrence time. Corrections cannot reference another correction, and the sum for an original cannot become negative. Tenant-scoped transaction locks make this check safe under competing corrections. Historical prices are read-only to the request identity.
 
+## Reproducible pricing and restatements
+
+Prices now have two clocks: `effective_from` says which usage occurrences a price covers, while database-assigned `recorded_at` says when the system learned that price. The administrative Python method `Store.provision_price` appends a new version under the same tenant transaction lock used by ingestion and publication. It is not an HTTP endpoint. Exact replay returns the existing version; changed content under the same ID or a second version at an existing effective boundary fails. Replacing a price at an identical boundary is deliberately unsupported; this project models newly introduced effective boundaries, not unrestricted contract amendment.
+
+Each new statement stores a PostgreSQL `known_at` cutoff. Its usage receipts and price receipts must be at or before that cutoff. A backdated price can therefore affect a new revision without changing the recomputation of an older revision. `created_at` uses this same database clock, avoiding an application/database clock comparison. Cutoff metadata is outside the semantic content fingerprint: republishing identical source content still returns the existing revision.
+
+Rating engine 1.1.0 includes price receipt metadata in its source fingerprint. The verifier retains engine 1.0.0 support for existing public documents, using their original four-column price fingerprints and their creation time as the legacy cutoff. Schema migration assigns existing seed prices their tenant creation time as a documented baseline. Earlier versions only provisioned those fixed prices at tenant creation; this does **not** recover an unknown history of manual administrative edits. Existing published documents are not rewritten by migration. A first publication under the new engine can create a new revision even when the monetary total is unchanged.
+
+`statement_diff.compare_statements(before, after)` produces an event-level bridge for a later revision of the same tenant, month and currency. It verifies content fingerprints, line arithmetic and total conservation, and rejects removed or altered source events. The reasons are:
+
+- `late_usage`: newly included original events, valued at the new revision's price.
+- `usage_correction`: newly included signed corrections, also valued at the new price.
+- `price_change`: repricing of existing original or correction lines, with zero change in units.
+
+This attribution convention handles simultaneous corrections and repricing without double-counting. For example, 100 units at 250 μUSD become 120 units at 200 μUSD after 40 late units and a −20 correction: the bridge is +8,000 late usage, −4,000 correction and −5,000 repricing, exactly the −1,000 μUSD statement change. Fingerprints detect changed content; they are not signatures or proof that source events are truthful.
+
 ## Snapshots and transactions
 
 Usage ingestion, product events and statement publication serialize within a tenant using a PostgreSQL transaction-scoped advisory lock. Different tenants can progress independently (a rare lock-hash collision only adds serialization). Runtime queries set the tenant context transaction-locally. Row-level security is enabled and forced; the runtime identity is not the table owner, superuser or BYPASSRLS role.

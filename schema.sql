@@ -21,6 +21,13 @@ CREATE TABLE IF NOT EXISTS prices (
     effective_from timestamptz NOT NULL, unit_price_microusd bigint NOT NULL CHECK(unit_price_microusd >= 0),
     PRIMARY KEY(tenant_id,id), UNIQUE(tenant_id,effective_from)
 );
+-- Existing releases only provisioned fixed prices at tenant creation. Preserve
+-- that known-before-publication baseline; new prices receive a database clock.
+ALTER TABLE prices ADD COLUMN IF NOT EXISTS recorded_at timestamptz;
+UPDATE prices p SET recorded_at=t.created_at FROM tenants t
+WHERE p.tenant_id=t.id AND p.recorded_at IS NULL;
+ALTER TABLE prices ALTER COLUMN recorded_at SET DEFAULT clock_timestamp();
+ALTER TABLE prices ALTER COLUMN recorded_at SET NOT NULL;
 CREATE TABLE IF NOT EXISTS statements (
     tenant_id text NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
     id text NOT NULL, month text NOT NULL, revision integer NOT NULL CHECK(revision > 0),

@@ -9,3 +9,5 @@
 .onboarding-guidance{margin-top:14px}
 .toolbar .button{white-space:nowrap}
 .snapshot-panel h2{font-size:26px;line-height:1.25;margin:18px 0}.snapshot-panel>.button{display:inline-block;margin:23px 0;line-height:1.7}.evidence-output>.text-link{display:inline-block;margin-top:12px}
+
+#reconciliation{margin:25px 0 40px}.revision-stages{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}.revision-stage{border:1px solid var(--line);border-radius:6px;padding:20px}.revision-stage h3{font-size:14px;margin:12px 0}.revision-stage>strong{display:block;color:var(--mint);font-size:25px;font-weight:500;margin:12px 0}.evidence-links{display:flex;gap:24px;flex-wrap:wrap;font-size:12px;color:var(--mint);margin-top:16px}select{color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:10px;font:inherit}select:focus-visible{outline:3px solid var(--mint);outline-offset:3px}#reconciliation .section-heading>p{max-width:420px}@media(max-width:800px){.revision-stages{grid-template-columns:1fr}.revision-stage{padding:16px}.evidence-links{gap:12px}.topbar nav{gap:13px}}

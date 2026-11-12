@@ -1,6 +1,8 @@
 # Meterwork
 
-**Usage metering, reproducible statements and product decisions—with inspectable failure evidence.**
+**Explain a changed usage statement, down to the event and the price known at publication.**
+
+[View the result](https://vasilendata.github.io/usage-metering-platform/#reconciliation) · [Inspect the case study](docs/LANDMARK.md) · [Run the independent reconciliation](verify_workload.py)
 
 An API business needs to explain a usage statement when requests are retried, arrive late, or are corrected. Meterwork records immutable usage, applies effective-dated prices, and publishes traceable statement revisions. Its instrumented sandbox also measures signup, activation, API usage and a fixed-protocol onboarding experiment.
 
@@ -12,6 +14,8 @@ An API business needs to explain a usage statement when requests are retried, ar
 |---|---|
 | Can retries charge twice? | Composite event identity, conflicting-payload rejection, concurrent replay test and executable local replay exercise. |
 | What happens to late usage or corrections? | Immutable statement revisions; original outputs stay accessible; per-event price trace. |
+| Can a backdated price rewrite history? | Separate business-effective and database-recorded clocks; historical knowledge cutoffs; validated event-level restatement bridges. |
+| Do all accounts reconcile independently? | Deterministic multi-account exercise: fixture arithmetic, separately written SQL and every statement revision agree. [Measured results](web/landmark.json). |
 | Can an omitted SQL tenant filter expose another account? | Forced PostgreSQL RLS under a non-owner role; direct cross-account read/write tests. |
 | Does interruption corrupt the published result? | Synchronized publisher process termination, rollback, replay and `pg_dump` restoration in `verify_release.py`. |
 | Does product data justify a launch? | Instrumented browser SDK, assignment/exposure checks, ordered funnel, mature retention cohorts and fixed-horizon decision gates. |
@@ -51,6 +55,8 @@ ruff check .
 ruff format --check .
 pytest -q
 node --test tests/test_sdk.mjs
+node --test tests/test_landmark.mjs
+python verify_workload.py --accounts 24 --originals 450 --clients 8 --output local-evidence/workload.json
 python verify_release.py --output local-evidence/release.json
 ```
 

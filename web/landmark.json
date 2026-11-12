@@ -1,0 +1,2698 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-12T19:58:21.103715+00:00",
+  "scope": "Synthetic local Store/PostgreSQL exercise; not HTTP, cloud, sustained load or customer traffic",
+  "seed": 713,
+  "parameters": {
+    "accounts": 24,
+    "originals_per_account": 450,
+    "late_per_account": 20,
+    "corrections_per_account": 20,
+    "replays_per_account": 40,
+    "clients": 8
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "postgresql": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit"
+  },
+  "totals": {
+    "accepted_events": 11760,
+    "replays_deduplicated": 960,
+    "conflicts_rejected": 24,
+    "statement_revisions": 72,
+    "reconciliation_difference_microusd": 0
+  },
+  "measurement": {
+    "whole_exercise_seconds": 95.69797,
+    "ingestion_seconds": 68.789092,
+    "ingestion_p50_seconds": 0.031902,
+    "ingestion_p95_seconds": 0.14207,
+    "latency_scope": "Includes accepted and duplicate Store calls, connection setup and tenant locks"
+  },
+  "checks": [
+    {
+      "name": "Every unique event committed exactly once",
+      "passed": true
+    },
+    {
+      "name": "Exact retries added no events",
+      "passed": true
+    },
+    {
+      "name": "Changed payloads with reused identity rejected",
+      "passed": true
+    },
+    {
+      "name": "Account 01 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 01 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 01 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 01: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 02 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 02 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 02 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 02: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 03 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 03 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 03 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 03: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 04 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 04 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 04 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 04: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 05 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 05 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 05 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 05: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 06 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 06 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 06 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 06: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 07 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 07 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 07 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 07: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 08 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 08 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 08 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 08: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 09 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 09 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 09 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 09: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 10 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 10 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 10 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 10: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 11 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 11 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 11 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 11: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 12 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 12 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 12 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 12: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 13 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 13 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 13 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 13: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 14 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 14 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 14 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 14: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 15 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 15 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 15 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 15: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 16 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 16 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 16 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 16: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 17 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 17 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 17 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 17: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 18 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 18 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 18 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 18: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 19 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 19 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 19 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 19: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 20 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 20 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 20 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 20: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 21 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 21 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 21 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 21: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 22 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 22 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 22 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 22: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 23 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 23 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 23 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 23: complete ledger and unchanged old revisions",
+      "passed": true
+    },
+    {
+      "name": "Account 24 / original: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 24 / late-and-corrected: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 24 / repriced: fixture = SQL = statement",
+      "passed": true
+    },
+    {
+      "name": "Account 24: complete ledger and unchanged old revisions",
+      "passed": true
+    }
+  ],
+  "case_study": {
+    "account": "synthetic-01",
+    "usage_restatement": {
+      "tenant_id": "911b2008-b8e4-40db-ad6d-b921cda5254a",
+      "month": "2026-10",
+      "currency": "USD",
+      "before_id": "23a39f91-3a6f-4f96-b7cb-7cd0ec3078c1",
+      "after_id": "bfa40075-da40-4805-a3a4-7e7914ea4506",
+      "before_revision": 1,
+      "after_revision": 2,
+      "before_amount_microusd": 34920700,
+      "after_amount_microusd": 34691600,
+      "delta_units": -1056,
+      "delta_amount_microusd": -229100,
+      "summary": {
+        "late_usage": {
+          "lines": 20,
+          "delta_units": 290,
+          "delta_amount_microusd": 63200
+        },
+        "usage_correction": {
+          "lines": 15,
+          "delta_units": -1346,
+          "delta_amount_microusd": -292300
+        },
+        "price_change": {
+          "lines": 0,
+          "delta_units": 0,
+          "delta_amount_microusd": 0
+        }
+      },
+      "changes": [
+        {
+          "source": "api-0",
+          "event_id": "adjust-003",
+          "reason": "usage_correction",
+          "delta_units": -30,
+          "delta_amount_microusd": -6000,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -6000,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-0",
+          "event_id": "adjust-009",
+          "reason": "usage_correction",
+          "delta_units": -81,
+          "delta_amount_microusd": -20250,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -20250,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-0",
+          "event_id": "adjust-012",
+          "reason": "usage_correction",
+          "delta_units": -107,
+          "delta_amount_microusd": -21400,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -21400,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-0",
+          "event_id": "adjust-015",
+          "reason": "usage_correction",
+          "delta_units": -132,
+          "delta_amount_microusd": -33000,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -33000,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-0",
+          "event_id": "adjust-018",
+          "reason": "usage_correction",
+          "delta_units": -158,
+          "delta_amount_microusd": -31600,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -31600,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-001",
+          "reason": "usage_correction",
+          "delta_units": -13,
+          "delta_amount_microusd": -3250,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -3250,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-004",
+          "reason": "usage_correction",
+          "delta_units": -39,
+          "delta_amount_microusd": -7800,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -7800,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-010",
+          "reason": "usage_correction",
+          "delta_units": -90,
+          "delta_amount_microusd": -18000,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -18000,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-016",
+          "reason": "usage_correction",
+          "delta_units": -141,
+          "delta_amount_microusd": -35250,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -35250,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-019",
+          "reason": "usage_correction",
+          "delta_units": -166,
+          "delta_amount_microusd": -33200,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -33200,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-002",
+          "reason": "usage_correction",
+          "delta_units": -22,
+          "delta_amount_microusd": -5500,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -5500,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-005",
+          "reason": "usage_correction",
+          "delta_units": -47,
+          "delta_amount_microusd": -9400,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -9400,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-008",
+          "reason": "usage_correction",
+          "delta_units": -73,
+          "delta_amount_microusd": -18250,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -18250,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-011",
+          "reason": "usage_correction",
+          "delta_units": -98,
+          "delta_amount_microusd": -19600,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -19600,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-017",
+          "reason": "usage_correction",
+          "delta_units": -149,
+          "delta_amount_microusd": -29800,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": -29800,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-000",
+          "reason": "late_usage",
+          "delta_units": 5,
+          "delta_amount_microusd": 1250,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 1250,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-001",
+          "reason": "late_usage",
+          "delta_units": 6,
+          "delta_amount_microusd": 1500,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 1500,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-002",
+          "reason": "late_usage",
+          "delta_units": 7,
+          "delta_amount_microusd": 1400,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 1400,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-003",
+          "reason": "late_usage",
+          "delta_units": 8,
+          "delta_amount_microusd": 1600,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 1600,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-004",
+          "reason": "late_usage",
+          "delta_units": 9,
+          "delta_amount_microusd": 1800,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 1800,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-005",
+          "reason": "late_usage",
+          "delta_units": 10,
+          "delta_amount_microusd": 2500,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 2500,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-006",
+          "reason": "late_usage",
+          "delta_units": 11,
+          "delta_amount_microusd": 2750,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 2750,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-007",
+          "reason": "late_usage",
+          "delta_units": 12,
+          "delta_amount_microusd": 2400,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 2400,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-008",
+          "reason": "late_usage",
+          "delta_units": 13,
+          "delta_amount_microusd": 2600,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 2600,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-009",
+          "reason": "late_usage",
+          "delta_units": 14,
+          "delta_amount_microusd": 2800,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 2800,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-010",
+          "reason": "late_usage",
+          "delta_units": 15,
+          "delta_amount_microusd": 3750,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 3750,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-011",
+          "reason": "late_usage",
+          "delta_units": 16,
+          "delta_amount_microusd": 4000,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 4000,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-012",
+          "reason": "late_usage",
+          "delta_units": 17,
+          "delta_amount_microusd": 3400,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 3400,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-013",
+          "reason": "late_usage",
+          "delta_units": 18,
+          "delta_amount_microusd": 3600,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 3600,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-014",
+          "reason": "late_usage",
+          "delta_units": 19,
+          "delta_amount_microusd": 3800,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 3800,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-015",
+          "reason": "late_usage",
+          "delta_units": 20,
+          "delta_amount_microusd": 5000,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 5000,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-016",
+          "reason": "late_usage",
+          "delta_units": 21,
+          "delta_amount_microusd": 5250,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 5250,
+          "before_price_version": null,
+          "after_price_version": "standard-v1"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-017",
+          "reason": "late_usage",
+          "delta_units": 22,
+          "delta_amount_microusd": 4400,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 4400,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-018",
+          "reason": "late_usage",
+          "delta_units": 23,
+          "delta_amount_microusd": 4600,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 4600,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-019",
+          "reason": "late_usage",
+          "delta_units": 24,
+          "delta_amount_microusd": 4800,
+          "before_amount_microusd": 0,
+          "after_amount_microusd": 4800,
+          "before_price_version": null,
+          "after_price_version": "standard-v2"
+        }
+      ],
+      "attribution": "New events at the new revision price; existing-event repricing separately."
+    },
+    "pricing_restatement": {
+      "tenant_id": "911b2008-b8e4-40db-ad6d-b921cda5254a",
+      "month": "2026-10",
+      "currency": "USD",
+      "before_id": "bfa40075-da40-4805-a3a4-7e7914ea4506",
+      "after_id": "576012e0-4a0b-4f8e-9bd5-733bcd358e76",
+      "before_revision": 2,
+      "after_revision": 3,
+      "before_amount_microusd": 34691600,
+      "after_amount_microusd": 33134575,
+      "delta_units": 0,
+      "delta_amount_microusd": -1557025,
+      "summary": {
+        "late_usage": {
+          "lines": 0,
+          "delta_units": 0,
+          "delta_amount_microusd": 0
+        },
+        "usage_correction": {
+          "lines": 0,
+          "delta_units": 0,
+          "delta_amount_microusd": 0
+        },
+        "price_change": {
+          "lines": 142,
+          "delta_units": 0,
+          "delta_amount_microusd": -1557025
+        }
+      },
+      "changes": [
+        {
+          "source": "api-0",
+          "event_id": "adjust-012",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": 2675,
+          "before_amount_microusd": -21400,
+          "after_amount_microusd": -18725,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "adjust-018",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": 3950,
+          "before_amount_microusd": -31600,
+          "after_amount_microusd": -27650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0004",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -5350,
+          "before_amount_microusd": 42800,
+          "after_amount_microusd": 37450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0006",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -7900,
+          "before_amount_microusd": 63200,
+          "after_amount_microusd": 55300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0011",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -14275,
+          "before_amount_microusd": 114200,
+          "after_amount_microusd": 99925,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0013",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -16825,
+          "before_amount_microusd": 134600,
+          "after_amount_microusd": 117775,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0018",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -23200,
+          "before_amount_microusd": 185600,
+          "after_amount_microusd": 162400,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0020",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -975,
+          "before_amount_microusd": 7800,
+          "after_amount_microusd": 6825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0025",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -7350,
+          "before_amount_microusd": 58800,
+          "after_amount_microusd": 51450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0027",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -9900,
+          "before_amount_microusd": 79200,
+          "after_amount_microusd": 69300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0032",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -16275,
+          "before_amount_microusd": 130200,
+          "after_amount_microusd": 113925,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0034",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -18825,
+          "before_amount_microusd": 150600,
+          "after_amount_microusd": 131775,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0039",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -425,
+          "before_amount_microusd": 3400,
+          "after_amount_microusd": 2975,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0041",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -2975,
+          "before_amount_microusd": 23800,
+          "after_amount_microusd": 20825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0046",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -9350,
+          "before_amount_microusd": 74800,
+          "after_amount_microusd": 65450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0048",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -11900,
+          "before_amount_microusd": 95200,
+          "after_amount_microusd": 83300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0053",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -18275,
+          "before_amount_microusd": 146200,
+          "after_amount_microusd": 127925,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0055",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -20825,
+          "before_amount_microusd": 166600,
+          "after_amount_microusd": 145775,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0060",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -2425,
+          "before_amount_microusd": 19400,
+          "after_amount_microusd": 16975,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0062",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4975,
+          "before_amount_microusd": 39800,
+          "after_amount_microusd": 34825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0067",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -11350,
+          "before_amount_microusd": 90800,
+          "after_amount_microusd": 79450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0069",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -13900,
+          "before_amount_microusd": 111200,
+          "after_amount_microusd": 97300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0074",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -20275,
+          "before_amount_microusd": 162200,
+          "after_amount_microusd": 141925,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0076",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -22825,
+          "before_amount_microusd": 182600,
+          "after_amount_microusd": 159775,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0081",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4425,
+          "before_amount_microusd": 35400,
+          "after_amount_microusd": 30975,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0083",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -6975,
+          "before_amount_microusd": 55800,
+          "after_amount_microusd": 48825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0088",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -13350,
+          "before_amount_microusd": 106800,
+          "after_amount_microusd": 93450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0090",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -15900,
+          "before_amount_microusd": 127200,
+          "after_amount_microusd": 111300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0095",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -22275,
+          "before_amount_microusd": 178200,
+          "after_amount_microusd": 155925,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0097",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -24825,
+          "before_amount_microusd": 198600,
+          "after_amount_microusd": 173775,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0102",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -6425,
+          "before_amount_microusd": 51400,
+          "after_amount_microusd": 44975,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0104",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -8975,
+          "before_amount_microusd": 71800,
+          "after_amount_microusd": 62825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0109",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -15350,
+          "before_amount_microusd": 122800,
+          "after_amount_microusd": 107450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0111",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -17900,
+          "before_amount_microusd": 143200,
+          "after_amount_microusd": 125300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0116",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -24275,
+          "before_amount_microusd": 194200,
+          "after_amount_microusd": 169925,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0118",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -2050,
+          "before_amount_microusd": 16400,
+          "after_amount_microusd": 14350,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0123",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -8425,
+          "before_amount_microusd": 67400,
+          "after_amount_microusd": 58975,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0125",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10975,
+          "before_amount_microusd": 87800,
+          "after_amount_microusd": 76825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0130",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -17350,
+          "before_amount_microusd": 138800,
+          "after_amount_microusd": 121450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0132",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -19900,
+          "before_amount_microusd": 159200,
+          "after_amount_microusd": 139300,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0137",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -1500,
+          "before_amount_microusd": 12000,
+          "after_amount_microusd": 10500,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0139",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4050,
+          "before_amount_microusd": 32400,
+          "after_amount_microusd": 28350,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0144",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10425,
+          "before_amount_microusd": 83400,
+          "after_amount_microusd": 72975,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-0",
+          "event_id": "request-0146",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -12975,
+          "before_amount_microusd": 103800,
+          "after_amount_microusd": 90825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-004",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": 975,
+          "before_amount_microusd": -7800,
+          "after_amount_microusd": -6825,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "adjust-019",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": 4150,
+          "before_amount_microusd": -33200,
+          "after_amount_microusd": -29050,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0001",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -1950,
+          "before_amount_microusd": 15600,
+          "after_amount_microusd": 13650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0006",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -8325,
+          "before_amount_microusd": 66600,
+          "after_amount_microusd": 58275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0008",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10875,
+          "before_amount_microusd": 87000,
+          "after_amount_microusd": 76125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0013",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -17250,
+          "before_amount_microusd": 138000,
+          "after_amount_microusd": 120750,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0015",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -19800,
+          "before_amount_microusd": 158400,
+          "after_amount_microusd": 138600,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0020",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -1400,
+          "before_amount_microusd": 11200,
+          "after_amount_microusd": 9800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0022",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -3950,
+          "before_amount_microusd": 31600,
+          "after_amount_microusd": 27650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0027",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10325,
+          "before_amount_microusd": 82600,
+          "after_amount_microusd": 72275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0029",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -12875,
+          "before_amount_microusd": 103000,
+          "after_amount_microusd": 90125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0034",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -19250,
+          "before_amount_microusd": 154000,
+          "after_amount_microusd": 134750,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0036",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -21800,
+          "before_amount_microusd": 174400,
+          "after_amount_microusd": 152600,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0041",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -3400,
+          "before_amount_microusd": 27200,
+          "after_amount_microusd": 23800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0043",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -5950,
+          "before_amount_microusd": 47600,
+          "after_amount_microusd": 41650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0048",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -12325,
+          "before_amount_microusd": 98600,
+          "after_amount_microusd": 86275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0050",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -14875,
+          "before_amount_microusd": 119000,
+          "after_amount_microusd": 104125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0055",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -21250,
+          "before_amount_microusd": 170000,
+          "after_amount_microusd": 148750,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0057",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -23800,
+          "before_amount_microusd": 190400,
+          "after_amount_microusd": 166600,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0062",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -5400,
+          "before_amount_microusd": 43200,
+          "after_amount_microusd": 37800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0064",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -7950,
+          "before_amount_microusd": 63600,
+          "after_amount_microusd": 55650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0069",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -14325,
+          "before_amount_microusd": 114600,
+          "after_amount_microusd": 100275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0071",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -16875,
+          "before_amount_microusd": 135000,
+          "after_amount_microusd": 118125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0076",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -23250,
+          "before_amount_microusd": 186000,
+          "after_amount_microusd": 162750,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0078",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -1025,
+          "before_amount_microusd": 8200,
+          "after_amount_microusd": 7175,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0083",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -7400,
+          "before_amount_microusd": 59200,
+          "after_amount_microusd": 51800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0085",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -9950,
+          "before_amount_microusd": 79600,
+          "after_amount_microusd": 69650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0090",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -16325,
+          "before_amount_microusd": 130600,
+          "after_amount_microusd": 114275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0092",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -18875,
+          "before_amount_microusd": 151000,
+          "after_amount_microusd": 132125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0097",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -475,
+          "before_amount_microusd": 3800,
+          "after_amount_microusd": 3325,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0099",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -3025,
+          "before_amount_microusd": 24200,
+          "after_amount_microusd": 21175,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0104",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -9400,
+          "before_amount_microusd": 75200,
+          "after_amount_microusd": 65800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0106",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -11950,
+          "before_amount_microusd": 95600,
+          "after_amount_microusd": 83650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0111",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -18325,
+          "before_amount_microusd": 146600,
+          "after_amount_microusd": 128275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0113",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -20875,
+          "before_amount_microusd": 167000,
+          "after_amount_microusd": 146125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0118",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -2475,
+          "before_amount_microusd": 19800,
+          "after_amount_microusd": 17325,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0120",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -5025,
+          "before_amount_microusd": 40200,
+          "after_amount_microusd": 35175,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0125",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -11400,
+          "before_amount_microusd": 91200,
+          "after_amount_microusd": 79800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0127",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -13950,
+          "before_amount_microusd": 111600,
+          "after_amount_microusd": 97650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0132",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -20325,
+          "before_amount_microusd": 162600,
+          "after_amount_microusd": 142275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0134",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -22875,
+          "before_amount_microusd": 183000,
+          "after_amount_microusd": 160125,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0139",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4475,
+          "before_amount_microusd": 35800,
+          "after_amount_microusd": 31325,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0141",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -7025,
+          "before_amount_microusd": 56200,
+          "after_amount_microusd": 49175,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0146",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -13400,
+          "before_amount_microusd": 107200,
+          "after_amount_microusd": 93800,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-1",
+          "event_id": "request-0148",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -15950,
+          "before_amount_microusd": 127600,
+          "after_amount_microusd": 111650,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-005",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": 1175,
+          "before_amount_microusd": -9400,
+          "after_amount_microusd": -8225,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "adjust-011",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": 2450,
+          "before_amount_microusd": -19600,
+          "after_amount_microusd": -17150,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0001",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -2375,
+          "before_amount_microusd": 19000,
+          "after_amount_microusd": 16625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0003",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4925,
+          "before_amount_microusd": 39400,
+          "after_amount_microusd": 34475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0008",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -11300,
+          "before_amount_microusd": 90400,
+          "after_amount_microusd": 79100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0010",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -13850,
+          "before_amount_microusd": 110800,
+          "after_amount_microusd": 96950,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0015",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -20225,
+          "before_amount_microusd": 161800,
+          "after_amount_microusd": 141575,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0017",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -22775,
+          "before_amount_microusd": 182200,
+          "after_amount_microusd": 159425,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0022",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4375,
+          "before_amount_microusd": 35000,
+          "after_amount_microusd": 30625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0024",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -6925,
+          "before_amount_microusd": 55400,
+          "after_amount_microusd": 48475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0029",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -13300,
+          "before_amount_microusd": 106400,
+          "after_amount_microusd": 93100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0031",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -15850,
+          "before_amount_microusd": 126800,
+          "after_amount_microusd": 110950,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0036",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -22225,
+          "before_amount_microusd": 177800,
+          "after_amount_microusd": 155575,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0038",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -24775,
+          "before_amount_microusd": 198200,
+          "after_amount_microusd": 173425,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0043",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -6375,
+          "before_amount_microusd": 51000,
+          "after_amount_microusd": 44625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0045",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -8925,
+          "before_amount_microusd": 71400,
+          "after_amount_microusd": 62475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0050",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -15300,
+          "before_amount_microusd": 122400,
+          "after_amount_microusd": 107100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0052",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -17850,
+          "before_amount_microusd": 142800,
+          "after_amount_microusd": 124950,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0057",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -24225,
+          "before_amount_microusd": 193800,
+          "after_amount_microusd": 169575,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0059",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -2000,
+          "before_amount_microusd": 16000,
+          "after_amount_microusd": 14000,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0064",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -8375,
+          "before_amount_microusd": 67000,
+          "after_amount_microusd": 58625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0066",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10925,
+          "before_amount_microusd": 87400,
+          "after_amount_microusd": 76475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0071",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -17300,
+          "before_amount_microusd": 138400,
+          "after_amount_microusd": 121100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0073",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -19850,
+          "before_amount_microusd": 158800,
+          "after_amount_microusd": 138950,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0078",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -1450,
+          "before_amount_microusd": 11600,
+          "after_amount_microusd": 10150,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0080",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -4000,
+          "before_amount_microusd": 32000,
+          "after_amount_microusd": 28000,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0085",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10375,
+          "before_amount_microusd": 83000,
+          "after_amount_microusd": 72625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0087",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -12925,
+          "before_amount_microusd": 103400,
+          "after_amount_microusd": 90475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0092",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -19300,
+          "before_amount_microusd": 154400,
+          "after_amount_microusd": 135100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0094",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -21850,
+          "before_amount_microusd": 174800,
+          "after_amount_microusd": 152950,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0099",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -3450,
+          "before_amount_microusd": 27600,
+          "after_amount_microusd": 24150,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0101",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -6000,
+          "before_amount_microusd": 48000,
+          "after_amount_microusd": 42000,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0106",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -12375,
+          "before_amount_microusd": 99000,
+          "after_amount_microusd": 86625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0108",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -14925,
+          "before_amount_microusd": 119400,
+          "after_amount_microusd": 104475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0113",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -21300,
+          "before_amount_microusd": 170400,
+          "after_amount_microusd": 149100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0115",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -23850,
+          "before_amount_microusd": 190800,
+          "after_amount_microusd": 166950,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0120",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -5450,
+          "before_amount_microusd": 43600,
+          "after_amount_microusd": 38150,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0122",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -8000,
+          "before_amount_microusd": 64000,
+          "after_amount_microusd": 56000,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0127",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -14375,
+          "before_amount_microusd": 115000,
+          "after_amount_microusd": 100625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0129",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -16925,
+          "before_amount_microusd": 135400,
+          "after_amount_microusd": 118475,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0134",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -23300,
+          "before_amount_microusd": 186400,
+          "after_amount_microusd": 163100,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0136",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -1075,
+          "before_amount_microusd": 8600,
+          "after_amount_microusd": 7525,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0141",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -7450,
+          "before_amount_microusd": 59600,
+          "after_amount_microusd": 52150,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0143",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -10000,
+          "before_amount_microusd": 80000,
+          "after_amount_microusd": 70000,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-2",
+          "event_id": "request-0148",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -16375,
+          "before_amount_microusd": 131000,
+          "after_amount_microusd": 114625,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-003",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -200,
+          "before_amount_microusd": 1600,
+          "after_amount_microusd": 1400,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-004",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -225,
+          "before_amount_microusd": 1800,
+          "after_amount_microusd": 1575,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-008",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -325,
+          "before_amount_microusd": 2600,
+          "after_amount_microusd": 2275,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-009",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -350,
+          "before_amount_microusd": 2800,
+          "after_amount_microusd": 2450,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-013",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -450,
+          "before_amount_microusd": 3600,
+          "after_amount_microusd": 3150,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-014",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -475,
+          "before_amount_microusd": 3800,
+          "after_amount_microusd": 3325,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-018",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -575,
+          "before_amount_microusd": 4600,
+          "after_amount_microusd": 4025,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        },
+        {
+          "source": "api-late",
+          "event_id": "late-019",
+          "reason": "price_change",
+          "delta_units": 0,
+          "delta_amount_microusd": -600,
+          "before_amount_microusd": 4800,
+          "after_amount_microusd": 4200,
+          "before_price_version": "standard-v2",
+          "after_price_version": "reviewed-v3"
+        }
+      ],
+      "attribution": "New events at the new revision price; existing-event repricing separately."
+    }
+  },
+  "accounts": [
+    {
+      "account": "synthetic-01",
+      "accepted_events": 490,
+      "original_microusd": 34920700,
+      "corrected_microusd": 34691600,
+      "repriced_microusd": 33134575,
+      "final_units": 157329,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-02",
+      "accepted_events": 490,
+      "original_microusd": 34662750,
+      "corrected_microusd": 34400000,
+      "repriced_microusd": 32820450,
+      "final_units": 156631,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-03",
+      "accepted_events": 490,
+      "original_microusd": 34999400,
+      "corrected_microusd": 34703200,
+      "repriced_microusd": 33101125,
+      "final_units": 157916,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-04",
+      "accepted_events": 490,
+      "original_microusd": 35137850,
+      "corrected_microusd": 34808000,
+      "repriced_microusd": 33208175,
+      "final_units": 158209,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-05",
+      "accepted_events": 490,
+      "original_microusd": 35276300,
+      "corrected_microusd": 34913000,
+      "repriced_microusd": 33364975,
+      "final_units": 158503,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-06",
+      "accepted_events": 490,
+      "original_microusd": 35414750,
+      "corrected_microusd": 35017800,
+      "repriced_microusd": 33447250,
+      "final_units": 158796,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-07",
+      "accepted_events": 490,
+      "original_microusd": 35652300,
+      "corrected_microusd": 35221900,
+      "repriced_microusd": 33628825,
+      "final_units": 160081,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-08",
+      "accepted_events": 490,
+      "original_microusd": 35741200,
+      "corrected_microusd": 35277150,
+      "repriced_microusd": 33661550,
+      "final_units": 160374,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-09",
+      "accepted_events": 490,
+      "original_microusd": 36028300,
+      "corrected_microusd": 35530800,
+      "repriced_microusd": 33892675,
+      "final_units": 161659,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-10",
+      "accepted_events": 490,
+      "original_microusd": 35968550,
+      "corrected_microusd": 35437400,
+      "repriced_microusd": 33851075,
+      "final_units": 160961,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-11",
+      "accepted_events": 490,
+      "original_microusd": 36107000,
+      "corrected_microusd": 35542400,
+      "repriced_microusd": 33933550,
+      "final_units": 161255,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-12",
+      "accepted_events": 490,
+      "original_microusd": 36394100,
+      "corrected_microusd": 35795850,
+      "repriced_microusd": 34189250,
+      "final_units": 162539,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-13",
+      "accepted_events": 490,
+      "original_microusd": 36483000,
+      "corrected_microusd": 35851300,
+      "repriced_microusd": 34222175,
+      "final_units": 162833,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-14",
+      "accepted_events": 490,
+      "original_microusd": 36472800,
+      "corrected_microusd": 35807450,
+      "repriced_microusd": 34155800,
+      "final_units": 163126,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-15",
+      "accepted_events": 490,
+      "original_microusd": 36611250,
+      "corrected_microusd": 35912450,
+      "repriced_microusd": 34263050,
+      "final_units": 163420,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-16",
+      "accepted_events": 490,
+      "original_microusd": 36551500,
+      "corrected_microusd": 35819050,
+      "repriced_microusd": 34171900,
+      "final_units": 162722,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-17",
+      "accepted_events": 490,
+      "original_microusd": 36244000,
+      "corrected_microusd": 35478100,
+      "repriced_microusd": 33907525,
+      "final_units": 161034,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-18",
+      "accepted_events": 490,
+      "original_microusd": 36134700,
+      "corrected_microusd": 35335150,
+      "repriced_microusd": 33742050,
+      "final_units": 160336,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-19",
+      "accepted_events": 490,
+      "original_microusd": 36372250,
+      "corrected_microusd": 35539250,
+      "repriced_microusd": 33923625,
+      "final_units": 161621,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-20",
+      "accepted_events": 490,
+      "original_microusd": 36510700,
+      "corrected_microusd": 35644050,
+      "repriced_microusd": 34030675,
+      "final_units": 161914,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-21",
+      "accepted_events": 490,
+      "original_microusd": 36351850,
+      "corrected_microusd": 35451750,
+      "repriced_microusd": 33840625,
+      "final_units": 161217,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-22",
+      "accepted_events": 490,
+      "original_microusd": 36044350,
+      "corrected_microusd": 35110600,
+      "repriced_microusd": 33526500,
+      "final_units": 159528,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-23",
+      "accepted_events": 490,
+      "original_microusd": 35736850,
+      "corrected_microusd": 34769650,
+      "repriced_microusd": 33187800,
+      "final_units": 157840,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    },
+    {
+      "account": "synthetic-24",
+      "accepted_events": 490,
+      "original_microusd": 36023950,
+      "corrected_microusd": 35023100,
+      "repriced_microusd": 33443500,
+      "final_units": 159124,
+      "reconciliation_difference_microusd": 0,
+      "revisions": 3
+    }
+  ],
+  "fixture_sha256": "ac509700038aa89fdd26430fda687a53762571123c14b4418bd19e2e02300098",
+  "source_files": {
+    "verify_workload.py": "6a1f3461f1cd74d0686217ea92d8d73226db370b630bead97f57a68f530f5fff",
+    "store.py": "6b7a00f91991c5b18941d6b70fdbf1cbce5def9e1fe025be6ea9eb6aa177b226",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "statement_diff.py": "db8cbc731e6e1d1658a9cbe3e55151adf468e34cd76b4bdab527c9499286e093",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "requirements.txt": "c46402cb9cce4e53643c99f8875f51163d91f9dafb0e796cd3079906de5761a6"
+  }
+}

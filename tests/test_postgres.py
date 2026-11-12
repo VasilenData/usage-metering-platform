@@ -1,14 +1,18 @@
 import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from datetime import UTC, datetime
 
 import psycopg
 import pytest
 from fastapi.testclient import TestClient
 
+from billing import rate, timestamp
 from demo import overview, run_scenario, seed, usage
+from statement_diff import compare_statements
 from store import Conflict, Store
+from verify_workload import sql_totals
 
 
 @pytest.fixture(scope="module")
@@ -72,6 +76,95 @@ def test_concurrent_publication_has_one_revision(store, tenant):
     with ThreadPoolExecutor(max_workers=4) as pool:
         documents = list(pool.map(lambda _: store.publish(tenant_id, "2026-10"), range(8)))
     assert len({document["id"] for document in documents}) == 1
+
+
+def test_backdated_price_preserves_old_revision_and_known_at_reproduction(store, tenant):
+    tid = tenant[0]
+    store.ingest_usage(tid, usage("original", 100, "2026-10-20T00:00:00Z"))
+    before = store.publish(tid, "2026-10")
+    price = store.provision_price(
+        tid, price_id="negotiated-v3", effective_from="2026-10-18T00:00:00Z", unit_price_microusd=150
+    )
+    assert price["recorded_at"] > timestamp(before["known_at"])
+    assert (
+        store.provision_price(
+            tid, price_id="negotiated-v3", effective_from="2026-10-18T00:00:00Z", unit_price_microusd=150
+        )
+        == price
+    )
+    with pytest.raises(Conflict):
+        store.provision_price(
+            tid, price_id="negotiated-v3", effective_from="2026-10-18T00:00:00Z", unit_price_microusd=151
+        )
+    with pytest.raises(Conflict):
+        store.provision_price(
+            tid, price_id="ambiguous", effective_from="2026-10-18T00:00:00Z", unit_price_microusd=150
+        )
+    after = store.publish(tid, "2026-10")
+    events, prices, _, statements = store.snapshot(tid)
+    assert before in statements
+    assert before["amount_microusd"] == 20000 and after["amount_microusd"] == 15000
+    for document in statements:
+        reproduced = rate(events, prices, tenant_id=tid, month="2026-10", known_at=document["known_at"])
+        assert reproduced["content_sha256"] == document["content_sha256"]
+    bridge = compare_statements(before, after)
+    assert bridge["summary"]["price_change"]["delta_amount_microusd"] == -5000
+    assert store.publish(tid, "2026-10") == after
+
+
+def test_price_administration_serializes_with_publication(store, tenant):
+    tid = tenant[0]
+    store.ingest_usage(tid, usage("original", 100, "2026-10-20T00:00:00Z"))
+    inserted, release, price_started = threading.Event(), threading.Event(), threading.Event()
+
+    def boundary(conn, document):
+        inserted.set()
+        assert release.wait(10)
+
+    def provision():
+        price_started.set()
+        return store.provision_price(
+            tid, price_id="concurrent-v3", effective_from="2026-10-18T00:00:00Z", unit_price_microusd=150
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        publishing = pool.submit(store.publish, tid, "2026-10", before_commit=boundary)
+        assert inserted.wait(10)
+        pricing = pool.submit(provision)
+        assert price_started.wait(10)
+        release.set()
+        before, price = publishing.result(), pricing.result()
+    after = store.publish(tid, "2026-10")
+    assert price["recorded_at"] > timestamp(before["known_at"])
+    assert before["amount_microusd"] == 20000
+    assert after["amount_microusd"] == 15000 and after["revision"] == 2
+
+
+@pytest.mark.parametrize("zone", ["UTC", "Europe/Lisbon", "Pacific/Auckland"])
+def test_independent_sql_uses_utc_month_boundaries_across_session_timezones(store, tenant, zone):
+    tid = tenant[0]
+    for index, occurred in enumerate(
+        [
+            "2026-09-30T23:59:59Z",
+            "2026-10-01T00:00:00Z",
+            "2026-10-31T23:59:59Z",
+            "2026-11-01T00:00:00Z",
+        ],
+        start=1,
+    ):
+        store.ingest_usage(tid, usage(str(index), index, occurred))
+    document = store.publish(tid, "2026-10")
+
+    class SessionZoneStore:
+        @contextmanager
+        def tenant(self, tenant_id):
+            with store.tenant(tenant_id) as conn:
+                conn.execute("SELECT set_config('TimeZone',%s,true)", (zone,))
+                yield conn
+
+    expected = {"events": 2, "units": 5, "amount_microusd": 1100}
+    assert sql_totals(SessionZoneStore(), tid, document["known_at"]) == expected
+    assert document["total_units"] == 5 and document["amount_microusd"] == 1100
 
 
 def test_database_rls_blocks_omitted_filter_cross_read_and_write(store, tenant):
