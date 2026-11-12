@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 import os
 import tempfile
 from pathlib import Path
@@ -11,6 +12,27 @@ from analytics import build_report
 from billing import canonical, rate, timestamp
 from demo import overview
 from store import Store
+
+
+def equivalent(actual, expected):
+    """Exact structure/integer identity, 1e-12 tolerance for platform libm results."""
+    if type(actual) is not type(expected):
+        return False
+    if isinstance(actual, float):
+        return (
+            math.isfinite(actual)
+            and math.isfinite(expected)
+            and math.isclose(actual, expected, rel_tol=1e-12, abs_tol=1e-12)
+        )
+    if isinstance(actual, dict):
+        return actual.keys() == expected.keys() and all(
+            equivalent(actual[key], expected[key]) for key in actual
+        )
+    if isinstance(actual, list):
+        return len(actual) == len(expected) and all(
+            equivalent(a, b) for a, b in zip(actual, expected, strict=True)
+        )
+    return actual == expected
 
 
 def verify(directory):
@@ -33,7 +55,7 @@ def verify(directory):
         for row in source["product_events"]
     )
     regenerated = build_report(source["product_events"], tenant_id="demo", as_of=source["as_of"])
-    assert regenerated == data["analytics"], "Product snapshot does not reproduce"
+    assert equivalent(regenerated, data["analytics"]), "Product snapshot does not reproduce"
     for document in data["statements"]:
         cutoff = timestamp(document["created_at"])
         known = [row for row in source["usage_events"] if timestamp(row["received_at"]) <= cutoff]
