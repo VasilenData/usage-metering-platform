@@ -6,13 +6,13 @@
   <meta name="description" content="A reproducible usage-metering and product analytics engineering demonstration. Inspect replay, pricing and tenant-isolation evidence.">
   <meta name="theme-color" content="#10191c">
   <title>Meterwork — Usage, explained.</title>
-  <link rel="stylesheet" href="./styles.css?v=3">
+  <link rel="stylesheet" href="./styles.css?v=4">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="topbar">
     <a class="brand" href="#overview" aria-label="Meterwork home"><span class="brand-icon" aria-hidden="true">m<span>·</span></span>meterwork<span class="edition">ENGINEERING LAB</span></a>
-    <nav aria-label="Main"><a href="#overview">Overview</a><a href="#statements">Statements</a><a href="#experiment">Experiment</a><a href="#evidence">Evidence</a></nav>
+    <nav aria-label="Main"><a href="#overview">Overview</a><a href="#reconciliation">Reconciliation</a><a href="#statements">Statements</a><a href="#experiment">Experiment</a><a href="#evidence">Evidence</a></nav>
     <a class="text-link" href="/openapi.json" target="_blank" rel="noopener">API schema <span aria-hidden="true">↗</span></a>
   </header>
   <main id="main">
@@ -28,6 +28,7 @@
       <article class="metric"><span class="small-label">ESTIMATED CHARGES</span><strong id="charges">—</strong><span>USD · non-binding statements</span></article>
       <article class="metric"><span class="small-label">REPLAYS DEDUPLICATED</span><strong id="duplicates">—</strong><span>Retries do not add usage</span></article>
     </section>
+    <section id="reconciliation" class="section-block" aria-labelledby="reconciliation-title"><div class="section-heading"><div><span class="eyebrow">A BILLING DISPUTE, MADE REPRODUCIBLE</span><h2 id="reconciliation-title">Why did the statement change?</h2></div><p>Reconcile every account across late events, corrections and a newly received backdated price. Historical statements retain what was known at publication.</p></div><div id="landmark-output" class="panel" aria-live="polite"><p class="body-copy">Loading the dated workload evidence.</p></div><p class="evidence-links"><a href="./landmark.json" download>Download measured results ↗</a><a href="https://github.com/VasilenData/usage-metering-platform/blob/main/verify_workload.py">Inspect the independent SQL oracle ↗</a><a href="https://github.com/VasilenData/usage-metering-platform/blob/main/docs/LANDMARK.md">Read the case study and limits ↗</a></p></section>
     <section class="console-grid" aria-label="Usage and interactive demonstration">
       <article class="panel usage-panel"><div class="panel-heading"><div><span class="small-label">EVENT-TIME VIEW</span><h2>Usage over time</h2></div><span class="tag neutral">UTC</span></div><div id="usage-chart" class="usage-chart" aria-live="polite"><p class="empty">Waiting for API data.</p></div><p class="caption">Event dates determine usage periods. Received dates preserve what was known when a statement was issued.</p></article>
       <article class="panel demo-panel"><div class="panel-heading"><div><span class="small-label">TRY THE SYSTEM</span><h2>Your own sandbox</h2></div><span id="sandbox-state" class="tag neutral">NOT STARTED</span></div><p class="body-copy">Create a temporary workspace, send a usage event, then replay it. The requests below call the live API.</p><button class="button primary full-width" id="start-sandbox" type="button">Start a new sandbox</button><p id="onboarding-guidance" class="body-copy onboarding-guidance" hidden></p><label class="field-label" for="demo-units">Units per request</label><div class="input-action"><input id="demo-units" type="number" min="1" max="1000" value="10" inputmode="numeric"><button class="button secondary" id="send-usage" type="button" disabled>Send usage <span aria-hidden="true">↗</span></button></div><button class="button secondary full-width" id="replay-usage" type="button" disabled>Replay the same event</button><p class="caption" id="sandbox-detail">Start an isolated, one-hour demo workspace. Demo onboarding events are recorded in that workspace.</p><div class="request-result" id="request-result" role="status">No request sent yet.</div><details class="auth-details"><summary>Use an existing workspace</summary><label class="field-label" for="api-token">Workspace bearer token</label><input id="api-token" type="password" autocomplete="off" spellcheck="false" placeholder="Kept in memory for this page only"><button class="button secondary full-width" id="connect-token" type="button">Connect workspace</button><p class="caption">The server determines the tenant from the token. This page never stores it in browser storage.</p></details></article>
@@ -39,6 +40,7 @@
     <footer><div class="brand footer-brand">meterwork<span class="edition">BUILT BY VASILEN KANCHEV</span></div><p>Public demo · synthetic data · estimated statements</p><a class="text-link" href="https://github.com/VasilenData/usage-metering-platform" target="_blank" rel="noopener">Inspect the engineering ↗</a></footer>
   </main>
   <div id="toast" class="toast" role="status" hidden></div>
-  <script type="module" src="./app.js?v=3"></script>
+  <script type="module" src="./app.js?v=4"></script>
+  <script type="module" src="./landmark.js?v=1"></script>
 </body>
 </html>
