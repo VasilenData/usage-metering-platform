@@ -25,7 +25,7 @@ class Capacity(ValueError):
 
 
 class Store:
-    def __init__(self, admin_url):
+    def __init__(self, admin_url, *, initialize=True):
         self.admin_url = admin_url
         # Deterministic secret derivation supports restarts without rotating an
         # existing process's credential. The admin connection is control-plane only.
@@ -35,6 +35,8 @@ class Store:
             + b":meter-runtime-v1"
         ).hexdigest()
         self.runtime_url = make_conninfo(admin_url, user="meter_runtime", password=password)
+        if not initialize:
+            return
         with self.admin() as conn:
             conn.execute("SELECT pg_advisory_xact_lock(87326001)")
             if not conn.execute("SELECT 1 FROM pg_roles WHERE rolname='meter_runtime'").fetchone():

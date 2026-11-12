@@ -10,7 +10,7 @@ An API business needs to explain a usage statement when requests are retried, ar
 
 | Question | Evidence |
 |---|---|
-| Can retries charge twice? | Composite event identity, conflicting-payload rejection, concurrent replay test and live replay exercise. |
+| Can retries charge twice? | Composite event identity, conflicting-payload rejection, concurrent replay test and executable local replay exercise. |
 | What happens to late usage or corrections? | Immutable statement revisions; original outputs stay accessible; per-event price trace. |
 | Can an omitted SQL tenant filter expose another account? | Forced PostgreSQL RLS under a non-owner role; direct cross-account read/write tests. |
 | Does interruption corrupt the published result? | Synchronized publisher process termination, rollback, replay and `pg_dump` restoration in `verify_release.py`. |
@@ -37,7 +37,7 @@ Python 3.12, FastAPI, PostgreSQL 17+, plain JavaScript ES modules, pytest, Hypot
 
 ## Run locally
 
-Set a local development `POSTGRES_PASSWORD` and run `docker compose up --build`. Open `http://localhost:8000`. PostgreSQL is on the private Compose network; only the app is bound to loopback.
+Set a URL-safe local development `POSTGRES_PASSWORD` and run `docker compose up --build`. Open `http://localhost:8000`. PostgreSQL is on the private Compose network; only the app is bound to loopback.
 
 Alternatively install `requirements-dev.txt`, create a PostgreSQL database, set `DATABASE_URL`, and run `uvicorn app:app --host 127.0.0.1 --port 8000`. The startup identity needs role/schema creation privileges in this **dedicated** demonstrator database. Do not point it at an employer or shared production database. No secrets belong in this repository.
 
@@ -56,4 +56,8 @@ python verify_release.py --output local-evidence/release.json
 
 The integration suite requires PostgreSQL and fails when its test database is absent. The release exercise also needs matching-version `pg_dump`/`pg_restore` in PATH, or `--pg-bin /path/to/postgresql/bin`. It creates and drops only a uniquely named disposable restore database. Keep generated dumps private; even this synthetic demonstration has hashed sandbox tokens.
 
-The public console exposes OpenAPI at `/openapi.json`. Create a sandbox, make an instrumented API call, replay it, then inspect the statement and product report. Tokens remain in browser memory and expire after one hour.
+When run locally, the API console exposes OpenAPI at `/openapi.json`. Create a sandbox, make an instrumented API call, replay it, then inspect the statement and product report. Tokens remain in browser memory and expire after one hour.
+
+## Public result
+
+[View the read-only evidence snapshot](https://vasilendata.github.io/usage-metering-platform/). The public website has **no hosted backend**. Its synthetic ledger, prices and product events are downloadable in [sources.json](web/sources.json); `python export_snapshot.py --verify` reconstructs every statement at its original knowledge cutoff and regenerates the product report. CI verifies this bundle before publishing it. The interactive API and failure exercises are available when run locally.

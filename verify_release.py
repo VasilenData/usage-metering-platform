@@ -55,7 +55,8 @@ def main():
 
     for scenario in ("replay", "late", "pricing", "isolation"):
         result = run_scenario(store, scenario)
-        results["checks"].extend(result["checks"])
+        for row in result["checks"]:
+            check(row["name"], row["passed"], row["detail"])
     tenant, _ = store.create_tenant()
     tid = tenant["id"]
     store.ingest_usage(tid, usage("first", 100))
@@ -135,7 +136,9 @@ s.publish(os.environ['METER_TEST_TENANT'],'2026-10',before_commit=boundary)
         "p95_seconds": round(sorted(durations)[189], 6),
         "scope": "local client + database; one tenant serialized by design; includes connection setup",
     }
-    before = store.snapshot(tid)
+    with store.admin() as conn:
+        tenant_ids = [row["id"] for row in conn.execute("SELECT id FROM tenants ORDER BY id").fetchall()]
+    before = {key: store.snapshot(key) for key in tenant_ids}
     with tempfile.TemporaryDirectory(prefix="meterwork-restore-") as directory:
         dump = Path(directory) / "backup.dump"
 
@@ -174,12 +177,14 @@ s.publish(os.environ['METER_TEST_TENANT'],'2026-10',before_commit=boundary)
                 check=True,
                 capture_output=True,
             )
-            restored = Store(make_conninfo(url, dbname=restore_name))
-            after = restored.snapshot(tid)
+            # Inspect the restored ACLs/policies as restored. Do not bootstrap or
+            # recreate them: that would mask permissions missing from the backup.
+            restored = Store(make_conninfo(url, dbname=restore_name), initialize=False)
+            after = {key: restored.snapshot(key) for key in tenant_ids}
             check(
                 "Backup restoration preserves ledger and statements",
                 digest(before) == digest(after),
-                "pg_dump custom archive restored into a new disposable database; canonical snapshots match",
+                "All fixture tenants' usage, pricing, product events and statements match after pg_dump restoration",
             )
             with restored.tenant(tid) as conn:
                 check(
@@ -195,6 +200,7 @@ s.publish(os.environ['METER_TEST_TENANT'],'2026-10',before_commit=boundary)
                 "archive_bytes": dump.stat().st_size,
                 "archive_sha256": hashlib.sha256(dump.read_bytes()).hexdigest(),
                 "snapshot_sha256": digest(before),
+                "tenants_reconciled": len(tenant_ids),
                 "scope": "entire disposable test database; synthetic data",
             }
         finally:
