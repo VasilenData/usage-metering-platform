@@ -28,6 +28,8 @@ jobs:
       - run: ruff format --check .
       - run: pytest -q --junitxml=tests.xml
       - run: python export_snapshot.py --verify
+      - name: Reconcile a fresh multi-account workload
+        run: python verify_workload.py --accounts 2 --originals 40 --output local-evidence/workload-ci.json
       - name: Verify dated evidence matches executed source
         run: |
           python - <<'PY'
@@ -37,12 +39,16 @@ jobs:
           assert report['checks'] and all(row['passed'] for row in report['checks'])
           for name, expected in report['source_files'].items():
               assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+          workload = json.loads(Path('web/landmark.json').read_text())
+          assert workload['checks'] and all(row['passed'] for row in workload['checks'])
+          for name, expected in workload['source_files'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
           PY
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: node --check web/app.js && node --check web/sdk.js
-      - run: node --test tests/test_sdk.mjs
+      - run: node --test tests/*.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
