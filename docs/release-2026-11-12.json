@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-11-12T18:53:43.343594+00:00",
+  "recorded_at": "2026-11-12T18:57:47.168930+00:00",
   "scope": "synthetic controlled local PostgreSQL exercise",
   "platform": "Windows-11-10.0.26300-SP0",
   "python": "3.12.14",
@@ -80,22 +80,22 @@
       "detail": "Restored database queried with restricted runtime identity"
     }
   ],
-  "client_crash_recovery_seconds": 0.065656,
+  "client_crash_recovery_seconds": 0.169352,
   "load": {
     "events": 200,
     "concurrency": 8,
-    "end_to_end_seconds": 1.48122,
-    "observed_events_per_second": 135.024,
-    "p50_seconds": 0.037493,
-    "p95_seconds": 0.145547,
+    "end_to_end_seconds": 1.408966,
+    "observed_events_per_second": 141.948,
+    "p50_seconds": 0.043042,
+    "p95_seconds": 0.145939,
     "scope": "local client + database; one tenant serialized by design; includes connection setup"
   },
   "backup_restore": {
-    "seconds": 1.159178,
-    "archive_bytes": 42725,
-    "archive_sha256": "f73010a3731a14ea9768da0b08dcad237d4290bf173b1e2830bc310f3fe60c19",
-    "snapshot_sha256": "20c959a8f03c94cbf7a6dba53bc49f2730bc6954c2ede397a7fbde9578436b6c",
-    "tenants_reconciled": 11,
+    "seconds": 1.301953,
+    "archive_bytes": 50825,
+    "archive_sha256": "3c4e363555a337b424a263c21aee3fc911de4e1fbdf5fa212558fc44236a3bfb",
+    "snapshot_sha256": "b6df0ce2bba31c5a73b3ecd61429c9b0c1f905d2601e042bd41f5a601158a104",
+    "tenants_reconciled": 17,
     "scope": "entire disposable test database; synthetic data"
   },
   "postgresql": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
@@ -104,7 +104,7 @@
     "app.py": "c0b4b022b92b551744e5dec969271698287c893fec29ad9f11a8275526ba3687",
     "billing.py": "32f05fce538e288c61a838a748c580943ad8a4aa460d12743eb3aa69b14bc373",
     "demo.py": "0c7fe8d1dffbb068f6138bb896306843bf27fc227b1bc86fa50a2461be6cd091",
-    "export_snapshot.py": "032c084c3a4b34d00d297b98efdd968e13493b8576db430589121eb90e31e206",
+    "export_snapshot.py": "3b23020cf342e6dcb40568ffcc97454fe811ed99c1a8eaf21ee6c0cdb898ac67",
     "requirements.txt": "c46402cb9cce4e53643c99f8875f51163d91f9dafb0e796cd3079906de5761a6",
     "schema.sql": "4b7f94159cef64c587560c35de2041c1cb410cb94fc6e25180a81bfb718643bc",
     "store.py": "54fb597654d321e22db178347608d826e3ae9bf5ced9b7a74d922429a0461715",
