@@ -54,6 +54,8 @@ jobs:
           path: historical-source
       - name: Exercise real HTTP concurrency and malformed requests
         run: python verify_http.py --baseline-dir historical-source --output local-evidence/http-ci.json
+      - name: Exercise restricted runtime and separate request allowances
+        run: python verify_runtime.py --output local-evidence/runtime-ci.json
       - name: Verify fresh and historical evidence against their own source
         run: |
           python - <<'PY'
@@ -63,6 +65,7 @@ jobs:
               ('docs/release-2026-11-12.json', Path('historical-source')),
               ('local-evidence/release-ci.json', Path('.')),
               ('local-evidence/http-ci.json', Path('.')),
+              ('local-evidence/runtime-ci.json', Path('.')),
           ]:
               report = json.loads(Path(filename).read_text())
               assert report['checks'] and all(row['passed'] for row in report['checks'])
@@ -87,6 +90,7 @@ jobs:
             local-evidence/http-ci.json
             local-evidence/release-ci.json
             local-evidence/workload-ci.json
+            local-evidence/runtime-ci.json
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
