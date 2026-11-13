@@ -1,0 +1,2029 @@
+{
+  "generated_at": "2026-11-13T02:15:30.165324+00:00",
+  "scope": "Synthetic HTTP requests to one real Uvicorn process and PostgreSQL 17 over loopback; no public backend",
+  "host": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "execution_environment": "GitHub-hosted Linux",
+  "source_commit": "6f65a5da4c862c6611af4e471eb3e0f4e4de2f63",
+  "ci_run_id": "43350733026",
+  "ci_run_attempt": "1",
+  "client_workers": 8,
+  "checks": [
+    {
+      "name": "Pre-fix oversize response lacks security/cache headers",
+      "passed": true,
+      "detail": "Reproduced over HTTP against the pinned pre-fix commit"
+    },
+    {
+      "name": "Pre-fix unsupported product values produce HTTP 500",
+      "passed": true,
+      "detail": "NaN, overflow to infinity, and escaped NUL reach PostgreSQL jsonb; baseline only"
+    },
+    {
+      "name": "Concurrent exact replay commits once",
+      "passed": true,
+      "detail": "24 HTTP requests, 8 clients, one accepted row and 23 duplicate acknowledgements"
+    },
+    {
+      "name": "Competing payloads cannot rewrite identity",
+      "passed": true,
+      "detail": "One of two payloads wins; its seven replays succeed and all eight opposing payloads conflict"
+    },
+    {
+      "name": "Cross-account correction rejected",
+      "passed": true,
+      "detail": "An original present only in account A is invisible from account B"
+    },
+    {
+      "name": "Body cannot override authenticated account",
+      "passed": true,
+      "detail": "Strict model rejects a tenant selector"
+    },
+    {
+      "name": "Concurrent corrections preserve nonnegative balance",
+      "passed": true,
+      "detail": "Only five -20 corrections can consume the same original 100 units"
+    },
+    {
+      "name": "Concurrent first assignment is stable",
+      "passed": true,
+      "detail": "Eight real HTTP requests receive one immutable assignment"
+    },
+    {
+      "name": "Concurrent unchanged publication reuses revision",
+      "passed": true,
+      "detail": "Eight callers receive the same statement identity"
+    },
+    {
+      "name": "Authenticated statement reads remain isolated",
+      "passed": true,
+      "detail": "A query parameter cannot change token scope; original revision remains intact"
+    },
+    {
+      "name": "Publication race has continuous immutable revisions",
+      "passed": true,
+      "detail": "Concurrent ingestion/publication can coalesce revisions but cannot create gaps or partial documents"
+    },
+    {
+      "name": "Every HTTP revision independently reconciles at its cutoff",
+      "passed": true,
+      "detail": "Separately written SQL oracle verifies event count, units and integer amount for every observed revision"
+    },
+    {
+      "name": "Final HTTP amount matches fixture arithmetic",
+      "passed": true,
+      "detail": "All usage is before the October 15 price boundary; 250 micro-USD per unit"
+    },
+    {
+      "name": "Restricted SQL still enforces isolation",
+      "passed": true,
+      "detail": "No foreign ledger rows; account B contains only its independent reused ID; account C balance is zero"
+    },
+    {
+      "name": "Unsupported JSON fails safely before writes",
+      "passed": true,
+      "detail": "Non-finite/overflow numbers, NUL, invalid Unicode, duplicate keys, excessive depth and malformed syntax return 422 with no product writes"
+    },
+    {
+      "name": "Fixed-length and chunked limits preserve headers",
+      "passed": true,
+      "detail": "Both 413 responses carry no-store, nosniff and CSP"
+    },
+    {
+      "name": "Missing, invalid, altered and expired tokens rejected",
+      "passed": true,
+      "detail": "Expiry is changed only by fixture administration; the expired token is checked through the real endpoint"
+    },
+    {
+      "name": "Anonymous-peer limiter rejects request 241",
+      "passed": true,
+      "detail": "Fresh Uvicorn process, 240 permitted unauthenticated requests from one peer then one 429; account allowances are separate"
+    },
+    {
+      "name": "Current release produced no HTTP 5xx",
+      "passed": true,
+      "detail": "Intentionally reproduced baseline failures are excluded and reported separately"
+    }
+  ],
+  "requests": [
+    {
+      "scenario": "baseline-sandbox",
+      "status": 201,
+      "seconds": 0.010141
+    },
+    {
+      "scenario": "baseline-oversize",
+      "status": 413,
+      "seconds": 0.001032
+    },
+    {
+      "scenario": "baseline-nan",
+      "status": 500,
+      "seconds": 0.017507
+    },
+    {
+      "scenario": "baseline-overflow",
+      "status": 500,
+      "seconds": 0.018535
+    },
+    {
+      "scenario": "baseline-nul",
+      "status": 500,
+      "seconds": 0.016601
+    },
+    {
+      "scenario": "sandbox",
+      "status": 201,
+      "seconds": 0.009741
+    },
+    {
+      "scenario": "sandbox",
+      "status": 201,
+      "seconds": 0.009378
+    },
+    {
+      "scenario": "sandbox",
+      "status": 201,
+      "seconds": 0.009207
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.05848
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.091293
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.095251
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.098582
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.105084
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.118828
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.13063
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.132804
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.097658
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.07597
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.080283
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.089553
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.097022
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.075874
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.108894
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.093156
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.111499
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.101251
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.092649
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.099456
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.061894
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.090589
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.088379
+    },
+    {
+      "scenario": "exact-replay",
+      "status": 200,
+      "seconds": 0.069045
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.056971
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.061497
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.06529
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.068978
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.079459
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.091748
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.10342
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.053493
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.055544
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.127479
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.079082
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.065357
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 409,
+      "seconds": 0.045485
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.081339
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.066236
+    },
+    {
+      "scenario": "conflicting-identity",
+      "status": 200,
+      "seconds": 0.05034
+    },
+    {
+      "scenario": "tenant-isolation",
+      "status": 200,
+      "seconds": 0.017281
+    },
+    {
+      "scenario": "tenant-isolation",
+      "status": 200,
+      "seconds": 0.017262
+    },
+    {
+      "scenario": "cross-tenant-correction",
+      "status": 422,
+      "seconds": 0.017533
+    },
+    {
+      "scenario": "tenant-selector-body",
+      "status": 422,
+      "seconds": 0.008367
+    },
+    {
+      "scenario": "correction-base",
+      "status": 200,
+      "seconds": 0.016916
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 200,
+      "seconds": 0.057916
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 200,
+      "seconds": 0.061231
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 200,
+      "seconds": 0.067009
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 200,
+      "seconds": 0.070355
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 200,
+      "seconds": 0.074383
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 422,
+      "seconds": 0.077061
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 422,
+      "seconds": 0.080489
+    },
+    {
+      "scenario": "competing-corrections",
+      "status": 422,
+      "seconds": 0.083367
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.090681
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.11634
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.119395
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.120998
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.125919
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.127665
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.129226
+    },
+    {
+      "scenario": "assignment-replay",
+      "status": 200,
+      "seconds": 0.130188
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.06151
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.065026
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.069968
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.072757
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.076044
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.07905
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.082815
+    },
+    {
+      "scenario": "publication-replay",
+      "status": 200,
+      "seconds": 0.086956
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.057811
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.063275
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.064523
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.070582
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.087087
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.092305
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.101256
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.119889
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.067479
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.062873
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.07151
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.080115
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.059455
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.058069
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.053151
+    },
+    {
+      "scenario": "publication-race",
+      "status": 200,
+      "seconds": 0.039871
+    },
+    {
+      "scenario": "publication-final",
+      "status": 200,
+      "seconds": 0.019428
+    },
+    {
+      "scenario": "tenant-selector-query",
+      "status": 200,
+      "seconds": 0.02194
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.001558
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.001101
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.00101
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.000959
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.000935
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.000914
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.000939
+    },
+    {
+      "scenario": "unsupported-json",
+      "status": 422,
+      "seconds": 0.000904
+    },
+    {
+      "scenario": "oversize",
+      "status": 413,
+      "seconds": 0.001028
+    },
+    {
+      "scenario": "oversize",
+      "status": 413,
+      "seconds": 0.000994
+    },
+    {
+      "scenario": "invalid-auth",
+      "status": 401,
+      "seconds": 0.001113
+    },
+    {
+      "scenario": "invalid-auth",
+      "status": 401,
+      "seconds": 0.007695
+    },
+    {
+      "scenario": "invalid-auth",
+      "status": 401,
+      "seconds": 0.007935
+    },
+    {
+      "scenario": "expired-auth",
+      "status": 401,
+      "seconds": 0.008173
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.001815
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.001008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0009
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000889
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000897
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000859
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000844
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000826
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000813
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000838
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000835
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000847
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000838
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000815
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000818
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00084
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000847
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000827
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000825
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000828
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00082
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000838
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000815
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000824
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000812
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000798
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000807
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000819
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000809
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000792
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00081
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000822
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000812
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00082
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000951
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000791
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00081
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000818
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000818
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000832
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.001043
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000852
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000833
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000828
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000831
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000827
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000822
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000815
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000839
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000845
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00083
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000893
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000866
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000818
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000797
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000826
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000835
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000826
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000838
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000807
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000801
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000825
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000788
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000879
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000808
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000809
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000798
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000891
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000805
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000791
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000797
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000817
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000883
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000808
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000791
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000808
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00083
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000809
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000798
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000852
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000851
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000812
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000817
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000864
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000826
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000805
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00078
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000796
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000832
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00081
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000787
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00081
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000851
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000799
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000797
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000809
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000808
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00081
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00082
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000868
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000799
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000778
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000785
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000818
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000809
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000811
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000799
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000795
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000795
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000848
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000789
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000834
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000799
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000812
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000807
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000793
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000821
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000858
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000801
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000784
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000822
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000817
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000817
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00079
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000805
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000799
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.001889
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000875
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000822
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000824
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000794
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000787
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000801
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000805
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00079
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000795
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000785
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000876
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000798
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000813
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000811
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000788
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000773
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000814
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00079
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000803
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000789
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000847
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000817
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000837
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000859
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000873
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000825
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000797
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000811
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000822
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000846
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000799
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000784
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000795
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000813
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000869
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000787
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000812
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000805
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00083
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000796
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000784
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000807
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000819
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00081
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000788
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000784
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.00084
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000801
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000809
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000815
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000795
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000806
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000819
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000816
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000802
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000787
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.0008
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000812
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000824
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000858
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 401,
+      "seconds": 0.000804
+    },
+    {
+      "scenario": "rate-limit",
+      "status": 429,
+      "seconds": 0.000573
+    }
+  ],
+  "limits": [
+    "Not a penetration test, maximum-throughput benchmark, production SLO or evidence of real customers",
+    "One process and one PostgreSQL node; no TLS, proxy, internet path or distributed limiter exercised",
+    "AI-assisted implementation and review; not an independent human review or assessment of owner proficiency"
+  ],
+  "baseline_commit": "94a4cb1885297442ef59bdcf9fcecc605ff2a97b",
+  "baseline_source_files": {
+    ".dockerignore": "34885eb6254e8f5a7dedff6e700a6a974097b87bfba5188aa7c8db0bab24dfa0",
+    ".github/workflows/README.md": "a1862372c35baa774d88b4645caeef89b6659066c868de432e92003bc391e0c5",
+    ".github/workflows/ci.yml": "7a0cc938e5e118014d2e141bf18a84ac43102c30b221133608101dd0ead80c0b",
+    ".gitignore": "76fa4bb908b777bcabeb979c4871af54d52f6e83e5508f767d50c01e3ec2dfdb",
+    "Dockerfile": "5138405b11ec5b03de4981a5dc31f7f18955f400182c9d7453a7b5ad21fffa13",
+    "LICENSE": "a9d6a5905826ca168a16a09a3cd6a6f6dab62116b28ab6ff8f0aefd669341127",
+    "README.md": "279c40c078bfbbe4669c03eaba396d572014b51ec4c249c0a7d27f39d1586e9b",
+    "analytics.py": "ea1e05225b5a63a13c2f68c17fcc211ee2bf8704b8baa0bd3a4a7b765eb49a2d",
+    "app.py": "c0b4b022b92b551744e5dec969271698287c893fec29ad9f11a8275526ba3687",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "compose.yaml": "b886fd40cd1c8e4787aef31832f2bbd7665ba4aea83ab1bb03b69e60f59c1c94",
+    "demo.py": "0c7fe8d1dffbb068f6138bb896306843bf27fc227b1bc86fa50a2461be6cd091",
+    "docs/CONTRACT.md": "0aff92fe6106096f43fd49dce58745bf8a0ef555a7c256bcbe710ea38010a4e4",
+    "docs/DELIVERY_PROMPT.md": "571c69bfca1af2391312faa997d5385cccaac6df80ef947ecaba2e580b01dcd8",
+    "docs/LANDMARK.md": "3d505e5a487a454139a0250f5f0199f280db23efba90182ff5c3374e2b2c4078",
+    "docs/PRODUCT_ANALYTICS.md": "b2391358f1408a25191cdcdcb1a401b8328be044b3328c072fb54426d70427d8",
+    "docs/README.md": "832ffeb4a7b63565e248022b31c2c41bd38ca9e75b2812df6e5cdc246969f4bd",
+    "docs/release-2026-11-12.json": "ed82d023ffc2f007b46d15c00b69d848da79a62143497527f13703a8d521b21a",
+    "export_snapshot.py": "e31da3eda608b89013f388b4fbb8f1bab8d06c5d52dbe95471ca64643c50bcaa",
+    "pyproject.toml": "04bbdb5df0af4074461edd662906b007e823d922ec07cc2e2a340f0c311d51a6",
+    "requirements-dev.txt": "f431caa33dd0f2b4d8fc845c87db663228e49cde00567c19642d157e5fdb181f",
+    "requirements.txt": "c46402cb9cce4e53643c99f8875f51163d91f9dafb0e796cd3079906de5761a6",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "statement_diff.py": "db8cbc731e6e1d1658a9cbe3e55151adf468e34cd76b4bdab527c9499286e093",
+    "store.py": "6b7a00f91991c5b18941d6b70fdbf1cbce5def9e1fe025be6ea9eb6aa177b226",
+    "tests/README.md": "837845504b5b0ce0ecb5bbb6d666df5643b42f8102cd13b5117180f298340e00",
+    "tests/test_analytics.py": "0de36f1d4746f07eadb6370c6840ebbadd3816149247dc9ed5c645e83d24ebad",
+    "tests/test_billing.py": "6dfac10d5315cf74650b75129ec8d31d85ea64a93b16ced2afeaee92b5f333a4",
+    "tests/test_http_extra.py": "fa5911277f3282ae1c244304a22f62d04153ac83ddf194c999372e5d89732893",
+    "tests/test_landmark.mjs": "8705c20934d727d6f618e108c94dc0a6105c02bad2f100524e379bd18af9d163",
+    "tests/test_postgres.py": "cbb83ab2436f1c231ee980a7742acdc108da19104e2f2accab45afe75cc92a52",
+    "tests/test_sdk.mjs": "3991f9bed0aaa4101a770edd70ae6ab3aeeb8659260f83a80e444458d12229d5",
+    "tests/test_snapshot.py": "f67b1b7881974cafc06fe147fe6e498123c810bf2414051ccf919e5e0b471d70",
+    "tests/test_statement_diff.py": "707b274c8def4382c4a4de0db0c6f9db4b6b68f55a0441a0bcd36d13fecd97e6",
+    "tests/test_workload.py": "69627910dd69e1b8f31f7e93fe0dd63a5eade79141611ea36b10e914d22d7ca5",
+    "verify_release.py": "2671419a9bc733130bee162dca0181e5bcb713eeebbc646863f430584f9ac665",
+    "verify_workload.py": "6a1f3461f1cd74d0686217ea92d8d73226db370b630bead97f57a68f530f5fff",
+    "web/README.md": "ad9dc40f2784adc326d698a69454ea40c895027bbb074a030f59efc337a26cbc",
+    "web/app.js": "244d4069c54a5899b85b8e0fdb180beb5120e53e7bb8623818dbecd70eb34168",
+    "web/demo.json": "261cacf32478810cf14690550a528c1f5dca1da7a858881b77b2356cd42483f8",
+    "web/index.html": "6d8ac0b0548cdcaea75d98a56399371aac7d45a881825d22bf6c7218dee3101f",
+    "web/landmark.js": "403a1de8351f6549d2def2d3aa9cde7a83078b98b11c641ca9031a61f3af4237",
+    "web/landmark.json": "47431ee8dc39e2027987937e58bb653ee217dd1bdddbb51112bbf646c8b8fe09",
+    "web/package.json": "a90fc33418afa2b9cbf4768524b021135b965ecdf993457505bfae3ac44a8428",
+    "web/sdk.js": "fa93fbb91cdb3b8b61f6a37704f161d79556dd790de766d7a264c1633bf5a41e",
+    "web/sources.json": "04e0df1b5f663d152e0a71feb0d5ac7ae3cc8dfde66f1ca65b1c07019f86ada7",
+    "web/styles.css": "1dee2315550b196a156348c8a0d0fcb8b050f93c754406f47ad88b22e59b4e7c"
+  },
+  "ledger": {
+    "account_a_revisions": 7,
+    "account_a_units": 195,
+    "account_a_amount_microusd": 48750,
+    "account_c_balance": 0
+  },
+  "summary": {
+    "current_requests": 345,
+    "current_status_counts": {
+      "200": 74,
+      "201": 3,
+      "401": 244,
+      "409": 8,
+      "413": 2,
+      "422": 13,
+      "429": 1
+    },
+    "current_5xx": 0,
+    "scenario_status_counts": {
+      "assignment-replay": {
+        "200": 8
+      },
+      "baseline-nan": {
+        "500": 1
+      },
+      "baseline-nul": {
+        "500": 1
+      },
+      "baseline-overflow": {
+        "500": 1
+      },
+      "baseline-oversize": {
+        "413": 1
+      },
+      "baseline-sandbox": {
+        "201": 1
+      },
+      "competing-corrections": {
+        "200": 5,
+        "422": 3
+      },
+      "conflicting-identity": {
+        "200": 8,
+        "409": 8
+      },
+      "correction-base": {
+        "200": 1
+      },
+      "cross-tenant-correction": {
+        "422": 1
+      },
+      "exact-replay": {
+        "200": 24
+      },
+      "expired-auth": {
+        "401": 1
+      },
+      "invalid-auth": {
+        "401": 3
+      },
+      "oversize": {
+        "413": 2
+      },
+      "publication-final": {
+        "200": 1
+      },
+      "publication-race": {
+        "200": 16
+      },
+      "publication-replay": {
+        "200": 8
+      },
+      "rate-limit": {
+        "401": 240,
+        "429": 1
+      },
+      "sandbox": {
+        "201": 3
+      },
+      "tenant-isolation": {
+        "200": 2
+      },
+      "tenant-selector-body": {
+        "422": 1
+      },
+      "tenant-selector-query": {
+        "200": 1
+      },
+      "unsupported-json": {
+        "422": 8
+      }
+    },
+    "latency_excluding_sequential_limiter_probe": {
+      "p50_seconds": 0.070162,
+      "p95_seconds": 0.127479,
+      "max_seconds": 0.132804,
+      "scope": "Observed bounded loopback HTTP exercise including token lookup and connection setup, not throughput capacity"
+    }
+  },
+  "postgresql": "PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "source_files": {
+    "app.py": "204ed8ae4ee0ec807d9df7402944b95cc8d90b7ba60596362b2ae6bf917c19dc",
+    "runtime_store.py": "0a2d3689c7ba3f1b7924c65aa21b490340c84e1a0f210499e01b4be95676b56c",
+    "runtime_schema.sql": "94e324727969b3aa96dbf0e9e82646ebce79d96216b4eeddf4e7e3a38362dbf7",
+    "bootstrap_runtime.py": "8b95b87ea7fdd6848651926e3d0af093b98332368431a1c7c9b948639dd73439",
+    "rate_limits.py": "3167c1cca1fd8f193b0560dc3c4e564da2b68080c8269e809a04bd9853da68d8",
+    "store.py": "6b7a00f91991c5b18941d6b70fdbf1cbce5def9e1fe025be6ea9eb6aa177b226",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "verify_http.py": "87ef0ee59d8308a9e9224452a00024f5c2f9458859b488bcb457c4696079aab8",
+    "verify_workload.py": "6a1f3461f1cd74d0686217ea92d8d73226db370b630bead97f57a68f530f5fff",
+    "tests/test_http_boundary.py": "d06db1b0b08f546a27b2c27875a497b147fa799bd3c20e21b11d80de7eefa276",
+    ".github/workflows/ci.yml": "c0e46f15be95a489344493d2ac30a7f4a3d49d53cf1b81425800a93f1a240830"
+  },
+  "fixture_cleanup": "Removed only sandbox accounts created by this exercise; Uvicorn children stopped"
+}
