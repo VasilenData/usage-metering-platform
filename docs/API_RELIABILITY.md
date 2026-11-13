@@ -2,6 +2,23 @@
 
 Meterwork must acknowledge a retry without charging twice, reject an account crossing, and publish a complete statement while more usage arrives. A database method test does not cover JSON parsing, authentication, response policy or the actual ASGI server. `verify_http.py` exercises that boundary using real HTTP to Uvicorn and a dedicated PostgreSQL database.
 
+## Observed result — 13 November 2026
+
+[CI run 43342144635](https://github.com/VasilenData/usage-metering-platform/actions/runs/43342144635) passed on source [`e99e3478`](https://github.com/VasilenData/usage-metering-platform/tree/e99e3478b82f9acc4d2b5a381c4e4935b16fe097). The downloaded `postgres-test-evidence` ZIP matched GitHub's SHA256 digest `a5f526a6d080d97b9e76937736df8168f3c3e1ad383caeee09cf343a40b67990`. The raw [HTTP result](http-2026-11-13.json) and [fresh recovery result](release-2026-11-13.json) are unchanged copies of that artifact, with source hashes verified against the implementation.
+
+| Measurement | Observed result and scope |
+|---|---|
+| Environment | GitHub-hosted Linux; PostgreSQL 17.12; one Uvicorn process at a time; synthetic loopback requests. |
+| Verification | 121 Python tests, no failures/errors/skips; 19 HTTP assertions including two pre-fix counterexamples; 15 Store-level recovery assertions. |
+| Current API requests | 345 total: 74×200, 3×201, 244×401, 8×409, 2×413, 13×422, 1×429; **zero 5xx**. Rejections are intentional test outcomes. |
+| Workload breakdown | 104 functional/concurrency requests with up to eight workers; separately, 241 sequential unauthenticated requests to test the unchanged limiter. Health/readiness polls are excluded. |
+| Observed latency | Across the 104 functional/concurrency requests: median **91.460 ms**, p95 **152.632 ms**, maximum **160.302 ms**. This includes validation and rejection cases; it is not an accepted-ingestion-only or capacity benchmark. |
+| Billing race | Seven immutable revisions all reconciled independently; final 194 units / 48,500 micro-USD matched fixture arithmetic. The winning conflicting payload and number of intermediate versions can differ in another valid schedule. |
+| Before/after failure | Pinned pre-fix code returned 500 for NaN, overflow and NUL properties. Current source returned 422 without product writes. The three intentional historical 500s are separate from current-request totals. |
+| Recovery, separate path | Abrupt publisher termination/retry preserved prior output; a fresh backup/restore reconciled all 11 fixture tenants and retained RLS. These are Store-level checks, not HTTP disaster-recovery guarantees. |
+
+This closes a concrete HTTP-boundary evidence gap. It does not establish actual users, sustained availability or independent human approval. The [limitations below](#what-this-does-not-establish) still apply.
+
 ## Counterexamples and changes
 
 Two request-boundary weaknesses motivated this upgrade:
@@ -36,7 +53,7 @@ Install `requirements-dev.txt`, provision a dedicated disposable PostgreSQL data
 python verify_http.py --output local-evidence/http.json
 ```
 
-The command binds Uvicorn only to `127.0.0.1`, disables access logs, keeps tokens in memory, terminates its application children and removes only accounts it created. PostgreSQL itself remains under the caller's control. Optional `--baseline-dir /path/to/pinned-checkout` reproduces the old errors; CI supplies the pinned checkout automatically. Do not use a shared or production database. No outbound notification is sent.
+The command binds Uvicorn only to `127.0.0.1`, disables access logs, keeps tokens in memory, terminates its application children and removes only accounts it created. PostgreSQL itself remains under the caller's control. Optional `--baseline-dir /path/to/pinned-checkout` reproduces the old errors; CI supplies the pinned checkout automatically. The baseline must have the exact pinned HEAD and tracked file bytes, with no additional Python sources; the report records its verified hashes. A different or modified checkout fails instead of being mislabelled. Do not use a shared or production database. No outbound notification is sent.
 
 On [GitHub Actions](https://github.com/VasilenData/usage-metering-platform/actions), open a successful **Ledger and product evidence** run and download **postgres-test-evidence**:
 
