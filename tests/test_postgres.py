@@ -281,10 +281,16 @@ def test_interrupted_seed_resumes_and_completed_seed_does_not_change_history(sto
 
 
 def test_http_contract_auth_and_input_validation(store, tenant):
-    import app
+    from psycopg.conninfo import make_conninfo
 
-    app.store = store
-    app.request_times.clear()
+    import app
+    from bootstrap_runtime import bootstrap
+    from runtime_store import RuntimeStore
+
+    password = "ci-runtime-disposable-only-20261113"
+    bootstrap(store.admin_url, password)
+    app.store = RuntimeStore(make_conninfo(store.admin_url, user="meter_api_runtime", password=password))
+    app.limits.clear()
     client = TestClient(app.app)
     token = tenant[1]
     headers = {"Authorization": f"Bearer {token}"}

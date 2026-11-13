@@ -32,7 +32,7 @@ The committed [measured result](../web/landmark.json) records parameters, source
 - Latencies include the local Python storage call, connection setup, tenant lock and transaction. They exclude HTTP, the browser and network deployment. The run is bounded; it is not a saturation test, production throughput claim or sustained operating history.
 - The SQL oracle and application use the same database. The separate fixture arithmetic provides an additional check but cannot prove correctness for every possible input. Hand-computed boundary cases and property tests cover other cases.
 - Prices remain administrative and append-only. The current contract adds a new effective boundary; it does not silently replace a price at an existing boundary. Taxes, tiered pricing, FX, payment collection and legally binding invoicing are outside scope.
-- PostgreSQL RLS guards omitted tenant filters under the restricted runtime role. It does not protect against a compromised host holding the administrative credential.
+- The dated workload uses the offline administrative Store and its legacy selector. The [subsequent HTTP runtime](RUNTIME_SECURITY.md) uses a separate credential and bearer-derived RLS. The workload results are not a penetration test or a measurement of that later runtime.
 - Existing fixed seed prices are migrated using tenant creation time. That is appropriate only for this project's documented old provisioning behavior; it is not a method for recovering missing historical knowledge timestamps in arbitrary systems.
 - Legacy statements used the application's publication clock. Unknown historical app/database clock skew or manual administrator changes cannot be reconstructed by this migration. New statements and price receipts share the database clock.
 

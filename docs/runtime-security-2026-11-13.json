@@ -1,0 +1,175 @@
+{
+  "generated_at": "2026-11-13T02:15:34.032510+00:00",
+  "source_commit": "6f65a5da4c862c6611af4e471eb3e0f4e4de2f63",
+  "ci_run_id": "43350733026",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "scope": "Synthetic PostgreSQL privilege probes and one-process loopback HTTP; no external deployment",
+  "checks": [
+    {
+      "name": "Legacy selector alone can choose another tenant",
+      "passed": true,
+      "detail": "Observed counterexample against the unchanged legacy offline Store role; not used by HTTP"
+    },
+    {
+      "name": "HTTP Store contains no admin connection",
+      "passed": true,
+      "detail": "Runtime receives only its own DSN"
+    },
+    {
+      "name": "Startup rejects administrative identity",
+      "passed": true,
+      "detail": "Actual PostgreSQL role inspected"
+    },
+    {
+      "name": "Startup rejects replication role drift",
+      "passed": true,
+      "detail": "Actual temporary administrative privilege change, then restored"
+    },
+    {
+      "name": "Startup rejects PUBLIC truncate drift",
+      "passed": true,
+      "detail": "Actual temporary administrative privilege change, then restored"
+    },
+    {
+      "name": "Startup rejects account delete drift",
+      "passed": true,
+      "detail": "Actual temporary administrative privilege change, then restored"
+    },
+    {
+      "name": "Startup rejects unexpected helper drift",
+      "passed": true,
+      "detail": "Actual temporary administrative privilege change, then restored"
+    },
+    {
+      "name": "Runtime denied: create role",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: create schema",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: replace auth function",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: assume control role",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: assume legacy role",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: read token hashes",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: invoke unrelated existing helper",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: insert price",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: update price",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: delete ledger",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Runtime denied: drop ledger",
+      "passed": true,
+      "detail": "PostgreSQL insufficient_privilege, transaction rolled back"
+    },
+    {
+      "name": "Tenant UUID cannot impersonate a bearer",
+      "passed": true,
+      "detail": "Direct SQL changes the old selector before and after authenticating A; only A remains visible"
+    },
+    {
+      "name": "Cross-account insert rejected by token-derived RLS",
+      "passed": true,
+      "detail": "Valid A token cannot insert B data"
+    },
+    {
+      "name": "Public demo remains read-only",
+      "passed": true,
+      "detail": "No authenticated disposable tenant exists for the public demo"
+    },
+    {
+      "name": "Control functions resist temp shadow and token SQL syntax",
+      "passed": true,
+      "detail": "A matching temporary token row cannot shadow public.tenants; SQL syntax in a parameter remains data"
+    },
+    {
+      "name": "Control functions have restricted ownership and execution",
+      "passed": true,
+      "detail": "Five fixed SECURITY DEFINER functions; NOLOGIN nonsuperuser owner; no PUBLIC execution"
+    },
+    {
+      "name": "Forwarded-header rotation cannot reset anonymous allowance",
+      "passed": true,
+      "detail": "241 requests from one real peer with rotating X-Forwarded-For; Uvicorn proxy headers disabled"
+    },
+    {
+      "name": "Anonymous and account allowances remain separate",
+      "passed": true,
+      "detail": "An exhausted anonymous peer bucket does not consume authenticated A's 120 requests"
+    },
+    {
+      "name": "A noisy account cannot consume B's allowance",
+      "passed": true,
+      "detail": "B succeeds from the same TCP peer after A is limited; no token/query/header-selected tenant key"
+    },
+    {
+      "name": "Expired bearer loses SQL access",
+      "passed": true,
+      "detail": "Expiry enforced in PostgreSQL, including direct SQL outside HTTP"
+    }
+  ],
+  "http": {
+    "requests": 363,
+    "anonymous": {
+      "401": 240,
+      "429": 1
+    },
+    "account_a": {
+      "200": 120,
+      "429": 1
+    },
+    "account_b": {
+      "200": 1
+    }
+  },
+  "source_files": {
+    "app.py": "204ed8ae4ee0ec807d9df7402944b95cc8d90b7ba60596362b2ae6bf917c19dc",
+    "runtime_store.py": "0a2d3689c7ba3f1b7924c65aa21b490340c84e1a0f210499e01b4be95676b56c",
+    "runtime_schema.sql": "94e324727969b3aa96dbf0e9e82646ebce79d96216b4eeddf4e7e3a38362dbf7",
+    "bootstrap_runtime.py": "8b95b87ea7fdd6848651926e3d0af093b98332368431a1c7c9b948639dd73439",
+    "rate_limits.py": "3167c1cca1fd8f193b0560dc3c4e564da2b68080c8269e809a04bd9853da68d8",
+    "verify_runtime.py": "3c633ce5548f19dbebf57c5dc96fe7158a33b473c9486bf51f8c137e6887b8bf",
+    "verify_http.py": "87ef0ee59d8308a9e9224452a00024f5c2f9458859b488bcb457c4696079aab8",
+    ".github/workflows/ci.yml": "c0e46f15be95a489344493d2ac30a7f4a3d49d53cf1b81425800a93f1a240830"
+  },
+  "limitations": [
+    "Bearer possession authorizes that account; app-host compromise can observe active bearers.",
+    "One-process in-memory admission quotas, not a distributed gateway or denial-of-service guarantee.",
+    "Anonymous clients behind one peer share its quota; sandbox capacity remains globally bounded to 64.",
+    "Administrative fixture tools intentionally retain admin capabilities outside the HTTP process.",
+    "Synthetic CI security checks are not an external penetration test or real adoption evidence."
+  ]
+}
