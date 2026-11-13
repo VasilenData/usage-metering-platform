@@ -4,36 +4,41 @@ import json
 import logging
 import math
 import os
-import threading
 import time
 import uuid
-from collections import deque
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictInt, field_validator
+from starlette.concurrency import run_in_threadpool
 
 from analytics import assigned_variant
 from billing import month_bounds
-from demo import overview, run_scenario, seed
-from store import Capacity, Conflict, Store
+from demo import overview, run_scenario
+from rate_limits import RateLimits
+from runtime_store import RuntimeStore
+from store import Capacity, Conflict
 
 logger = logging.getLogger("meter")
 store = None
-request_times = deque(maxlen=240)
-rate_lock = threading.Lock()
+limits = RateLimits()
 
 
 @asynccontextmanager
 async def lifespan(application):
     global store
-    store = Store(os.environ["DATABASE_URL"])
-    seed(store)
+    if any(
+        os.environ.get(name)
+        for name in ("ADMIN_DATABASE_URL", "DATABASE_URL", "TEST_DATABASE_URL", "METER_RUNTIME_PASSWORD")
+    ):
+        raise ValueError("HTTP process must not receive an administrative DATABASE_URL")
+    store = RuntimeStore(os.environ["METER_RUNTIME_DATABASE_URL"])
+    limits.clear()
     yield
 
 
@@ -89,13 +94,15 @@ class Scenario(StrictModel):
     scenario: Literal["replay", "late", "pricing", "isolation"]
 
 
-def identity(authorization: Annotated[str | None, Header()] = None):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(401, "A sandbox bearer token is required")
-    tenant = store.authenticate(authorization[7:])
+def identity(request: Request):
+    tenant = getattr(request.state, "identity", None)
     if not tenant:
-        raise HTTPException(401, "Invalid or expired sandbox token")
+        raise HTTPException(401, "A valid unexpired sandbox bearer token is required")
     return tenant
+
+
+def request_store(request: Request):
+    return request.state.runtime
 
 
 def validate_json_body(body: bytes):
@@ -150,34 +157,33 @@ async def protections(request: Request, call_next):
         return response
 
     if request.url.path.startswith("/api/"):
+        peer = request.client.host if request.client else "unknown"
+
+        def invalid(status, detail):
+            if not limits.admit("anonymous", peer):
+                return protected(
+                    JSONResponse(
+                        {"detail": "Request allowance exhausted; retry in one minute"},
+                        429,
+                        headers={"Retry-After": "60"},
+                    )
+                )
+            return protected(JSONResponse({"detail": detail}, status))
+
         try:
             size = int(request.headers.get("content-length", "0"))
             if size < 0:
                 raise ValueError("Negative content length")
         except ValueError:
-            return protected(JSONResponse({"detail": "Invalid content length"}, 400))
+            return invalid(400, "Invalid content length")
         if size > 8192:
-            return protected(JSONResponse({"detail": "Request exceeds 8KB"}, 413))
-        # Fixed-size, process-wide limit. One replica is deliberate for this demo.
-        with rate_lock:
-            now = time.monotonic()
-            while request_times and now - request_times[0] >= 60:
-                request_times.popleft()
-            if len(request_times) >= 240:
-                return protected(
-                    JSONResponse(
-                        {"detail": "Demo request limit; retry in one minute"},
-                        429,
-                        headers={"Retry-After": "60"},
-                    )
-                )
-            request_times.append(now)
+            return invalid(413, "Request exceeds 8KB")
         chunks = []
         received = 0
         async for chunk in request.stream():
             received += len(chunk)
             if received > 8192:
-                return protected(JSONResponse({"detail": "Request exceeds 8KB"}, 413))
+                return invalid(413, "Request exceeds 8KB")
             chunks.append(chunk)
         # Starlette's cached request replays this bounded body to call_next.
         request._body = b"".join(chunks)
@@ -185,7 +191,23 @@ async def protections(request: Request, call_next):
             try:
                 validate_json_body(request._body)
             except (ValueError, UnicodeError, RecursionError):
-                return protected(JSONResponse({"detail": "Invalid or unsupported JSON body"}, 422))
+                return invalid(422, "Invalid or unsupported JSON body")
+        header = request.headers.get("authorization", "")
+        token = header[7:] if header.startswith("Bearer ") else None
+        tenant = await run_in_threadpool(store.authenticate, token) if token else None
+        kind = "account" if tenant else "anonymous"
+        # Forwarded headers are deliberately ignored: no trusted proxy is configured.
+        key = tenant["id"] if tenant else (request.client.host if request.client else "unknown")
+        if not limits.admit(kind, key):
+            return protected(
+                JSONResponse(
+                    {"detail": "Request allowance exhausted; retry in one minute"},
+                    429,
+                    headers={"Retry-After": "60"},
+                )
+            )
+        request.state.identity = tenant
+        request.state.runtime = store.scoped(token) if tenant else None
     return protected(await call_next(request))
 
 
@@ -197,19 +219,19 @@ async def domain_error(request, exc):
 
 @app.get("/healthz")
 def health():
-    with store.tenant("demo") as conn:
+    with store.connection() as conn:
         conn.execute("SELECT 1")
     return {"status": "ok", "version": "1.0.0"}
 
 
 @app.get("/api/demo")
 def public_demo():
-    return overview(store, "demo")
+    return overview(store.scoped(demo=True), "demo")
 
 
 @app.post("/api/sandbox", status_code=201)
 def sandbox():
-    tenant, token = store.create_tenant()
+    tenant, token = store.scoped().create_tenant()
     return {
         "token": token,
         "tenant_id": tenant["id"],
@@ -220,36 +242,36 @@ def sandbox():
 
 @app.post("/api/demo/run")
 def exercise(body: Scenario):
-    return run_scenario(store, body.scenario)
+    return run_scenario(store.scoped(), body.scenario)
 
 
 @app.get("/api/overview")
-def tenant_overview(tenant=Depends(identity)):
-    return overview(store, tenant["id"])
+def tenant_overview(tenant=Depends(identity), runtime=Depends(request_store)):
+    return overview(runtime, tenant["id"])
 
 
 @app.post("/api/usage")
-def ingest(body: Usage, tenant=Depends(identity)):
-    return store.ingest_usage(tenant["id"], body.model_dump())
+def ingest(body: Usage, tenant=Depends(identity), runtime=Depends(request_store)):
+    return runtime.ingest_usage(tenant["id"], body.model_dump())
 
 
 @app.post("/api/events")
-def event(body: Product, tenant=Depends(identity)):
+def event(body: Product, tenant=Depends(identity), runtime=Depends(request_store)):
     if body.event_name == "exposure":
         if body.experiment_id is None or body.variant != assigned_variant(body.actor_id, body.experiment_id):
             raise ValueError("Exposure must use the server-assigned experiment variant")
-    return store.ingest_product(tenant["id"], body.model_dump())
+    return runtime.ingest_product(tenant["id"], body.model_dump())
 
 
 @app.post("/api/assignment")
-def assign(body: Assignment, tenant=Depends(identity)):
+def assign(body: Assignment, tenant=Depends(identity), runtime=Depends(request_store)):
     variant = assigned_variant(body.actor_id, body.experiment_id)
     event_id = "assignment:" + str(uuid.uuid5(uuid.NAMESPACE_URL, body.experiment_id + ":" + body.actor_id))
     # Repeated assignments reuse the original immutable timestamp and event identity.
-    with store.tenant(tenant["id"]) as conn:
+    with runtime.tenant(tenant["id"]) as conn:
         old = conn.execute("SELECT occurred_at FROM product_events WHERE event_id=%s", (event_id,)).fetchone()
     try:
-        store.ingest_product(
+        runtime.ingest_product(
             tenant["id"],
             {
                 "event_id": event_id,
@@ -265,7 +287,7 @@ def assign(body: Assignment, tenant=Depends(identity)):
         # A concurrent first assignment may have committed between the lookup
         # and insertion. Accept only the same immutable assignment, not a reused
         # identity for a different event or experiment.
-        with store.tenant(tenant["id"]) as conn:
+        with runtime.tenant(tenant["id"]) as conn:
             winner = conn.execute(
                 "SELECT actor_id,event_name,experiment_id,variant,properties FROM product_events WHERE event_id=%s",
                 (event_id,),
@@ -283,14 +305,14 @@ def assign(body: Assignment, tenant=Depends(identity)):
 
 
 @app.post("/api/statements")
-def publish(body: StatementRequest, tenant=Depends(identity)):
+def publish(body: StatementRequest, tenant=Depends(identity), runtime=Depends(request_store)):
     month_bounds(body.month)
-    return store.publish(tenant["id"], body.month)
+    return runtime.publish(tenant["id"], body.month)
 
 
 @app.get("/api/statements")
-def statements(month: str | None = None, tenant=Depends(identity)):
-    rows = store.snapshot(tenant["id"])[3]
+def statements(month: str | None = None, tenant=Depends(identity), runtime=Depends(request_store)):
+    rows = runtime.snapshot(tenant["id"])[3]
     return [row for row in rows if month is None or row["month"] == month]
 
 

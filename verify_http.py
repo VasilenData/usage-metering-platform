@@ -20,8 +20,9 @@ from pathlib import Path
 
 import httpx
 import psycopg
-from psycopg.conninfo import conninfo_to_dict
+from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
+from bootstrap_runtime import bootstrap
 from store import Store
 from verify_workload import quantile, sql_totals
 
@@ -70,7 +71,20 @@ def product(properties):
 
 
 @contextmanager
-def server(directory, url):
+def server(directory, url, *, runtime=False):
+    environment = {
+        key: value
+        for key, value in os.environ.items()
+        if key
+        not in {
+            "DATABASE_URL",
+            "ADMIN_DATABASE_URL",
+            "TEST_DATABASE_URL",
+            "METER_RUNTIME_PASSWORD",
+            "PGPASSWORD",
+        }
+    }
+    environment["METER_RUNTIME_DATABASE_URL" if runtime else "DATABASE_URL"] = url
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
         port = listener.getsockname()[1]
@@ -88,9 +102,10 @@ def server(directory, url):
                 "--port",
                 str(port),
                 "--no-access-log",
+                "--no-proxy-headers",
             ],
             cwd=directory,
-            env={**os.environ, "DATABASE_URL": url},
+            env=environment,
             stdout=log,
             stderr=log,
         )
@@ -243,7 +258,10 @@ def main():
                     "NaN, overflow to infinity, and escaped NUL reach PostgreSQL jsonb; baseline only",
                 )
 
-        with server(Path.cwd(), url) as client:
+        password = "ci-runtime-disposable-only-20261113"
+        bootstrap(url, password)
+        runtime_url = make_conninfo(url, user="meter_api_runtime", password=password)
+        with server(Path.cwd(), runtime_url, runtime=True) as client:
             tenant_a, token_a = sandbox(client)
             tenant_b, token_b = sandbox(client)
             tenant_c, token_c = sandbox(client)
@@ -500,15 +518,15 @@ def main():
             }
 
         # A fresh single process exercises the limiter without disabling or raising it.
-        with server(Path.cwd(), url) as client:
+        with server(Path.cwd(), runtime_url, runtime=True) as client:
             started = time.monotonic()
             responses = [request(client, "rate-limit", "GET", "/api/overview") for _ in range(241)]
             check(
-                "Unmodified process limiter rejects request 241",
+                "Anonymous-peer limiter rejects request 241",
                 time.monotonic() - started < 60
                 and Counter(r.status_code for r in responses) == {401: 240, 429: 1}
                 and responses[-1].headers.get("retry-after") == "60",
-                "Fresh Uvicorn process, 240 permitted unauthenticated requests then one 429; early error headers also verified",
+                "Fresh Uvicorn process, 240 permitted unauthenticated requests from one peer then one 429; account allowances are separate",
             )
         current = [r for r in records if not r["scenario"].startswith("baseline-")]
         durations = [r["seconds"] for r in current if r["scenario"] != "rate-limit"]
@@ -542,6 +560,10 @@ def main():
                 Path(name)
                 for name in [
                     "app.py",
+                    "runtime_store.py",
+                    "runtime_schema.sql",
+                    "bootstrap_runtime.py",
+                    "rate_limits.py",
                     "store.py",
                     "billing.py",
                     "schema.sql",
