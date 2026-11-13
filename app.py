@@ -1,6 +1,8 @@
 """Bounded public demo and tenant-authenticated usage API."""
 
+import json
 import logging
+import math
 import os
 import threading
 import time
@@ -96,24 +98,78 @@ def identity(authorization: Annotated[str | None, Header()] = None):
     return tenant
 
 
+def validate_json_body(body: bytes):
+    """Reject ambiguous or non-storable JSON before authentication/SQL side effects."""
+
+    def object_pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("Duplicate JSON key")
+            result[key] = value
+        return result
+
+    def nonfinite(_):
+        raise ValueError("Non-finite JSON number")
+
+    value = json.loads(body, parse_constant=nonfinite, object_pairs_hook=object_pairs)
+    pending = [(value, 0)]
+    while pending:
+        value, depth = pending.pop()
+        if depth > 64:
+            raise ValueError("JSON nesting exceeds 64 levels")
+        if isinstance(value, str):
+            if "\x00" in value:
+                raise ValueError("JSON contains a null character")
+            value.encode("utf-8", errors="strict")
+        elif isinstance(value, float) and not math.isfinite(value):
+            # A valid JSON exponent such as 1e400 also overflows Python floats.
+            raise ValueError("Non-finite JSON number")
+        elif isinstance(value, dict):
+            pending.extend((key, depth + 1) for key in value)
+            pending.extend((item, depth + 1) for item in value.values())
+        elif isinstance(value, list):
+            pending.extend((item, depth + 1) for item in value)
+
+
 @app.middleware("http")
 async def protections(request: Request, call_next):
     started = time.perf_counter()
+
+    def protected(response):
+        # Early middleware rejections need the same cache/security policy as success.
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"
+        )
+        response.headers["Cache-Control"] = (
+            "no-store" if request.url.path.startswith("/api/") else "public, max-age=60"
+        )
+        response.headers["Server-Timing"] = f"app;dur={(time.perf_counter() - started) * 1000:.2f}"
+        return response
+
     if request.url.path.startswith("/api/"):
         try:
             size = int(request.headers.get("content-length", "0"))
+            if size < 0:
+                raise ValueError("Negative content length")
         except ValueError:
-            return JSONResponse({"detail": "Invalid content length"}, 400)
+            return protected(JSONResponse({"detail": "Invalid content length"}, 400))
         if size > 8192:
-            return JSONResponse({"detail": "Request exceeds 8KB"}, 413)
+            return protected(JSONResponse({"detail": "Request exceeds 8KB"}, 413))
         # Fixed-size, process-wide limit. One replica is deliberate for this demo.
         with rate_lock:
             now = time.monotonic()
             while request_times and now - request_times[0] >= 60:
                 request_times.popleft()
             if len(request_times) >= 240:
-                return JSONResponse(
-                    {"detail": "Demo request limit; retry in one minute"}, 429, headers={"Retry-After": "60"}
+                return protected(
+                    JSONResponse(
+                        {"detail": "Demo request limit; retry in one minute"},
+                        429,
+                        headers={"Retry-After": "60"},
+                    )
                 )
             request_times.append(now)
         chunks = []
@@ -121,21 +177,16 @@ async def protections(request: Request, call_next):
         async for chunk in request.stream():
             received += len(chunk)
             if received > 8192:
-                return JSONResponse({"detail": "Request exceeds 8KB"}, 413)
+                return protected(JSONResponse({"detail": "Request exceeds 8KB"}, 413))
             chunks.append(chunk)
         # Starlette's cached request replays this bounded body to call_next.
         request._body = b"".join(chunks)
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["Referrer-Policy"] = "no-referrer"
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"
-    )
-    response.headers["Cache-Control"] = (
-        "no-store" if request.url.path.startswith("/api/") else "public, max-age=60"
-    )
-    response.headers["Server-Timing"] = f"app;dur={(time.perf_counter() - started) * 1000:.2f}"
-    return response
+        if request._body:
+            try:
+                validate_json_body(request._body)
+            except (ValueError, UnicodeError, RecursionError):
+                return protected(JSONResponse({"detail": "Invalid or unsupported JSON body"}, 422))
+    return protected(await call_next(request))
 
 
 @app.exception_handler(ValueError)

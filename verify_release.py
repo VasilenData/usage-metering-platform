@@ -42,7 +42,11 @@ def main():
     store = Store(url)
     results = {
         "recorded_at": datetime.now(UTC).isoformat(),
-        "scope": "synthetic controlled local PostgreSQL exercise",
+        "scope": "synthetic controlled PostgreSQL exercise; Store calls, not HTTP",
+        "execution_environment": "GitHub-hosted Linux" if os.getenv("GITHUB_ACTIONS") == "true" else "local",
+        "source_commit": os.getenv("GITHUB_SHA", "uncommitted-local"),
+        "ci_run_id": os.getenv("GITHUB_RUN_ID"),
+        "ci_run_attempt": os.getenv("GITHUB_RUN_ATTEMPT"),
         "platform": platform.platform(),
         "python": platform.python_version(),
         "checks": [],
