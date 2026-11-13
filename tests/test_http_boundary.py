@@ -83,3 +83,24 @@ def test_supported_unicode_nested_json_reaches_authentication(monkeypatch):
         headers={"Authorization": "Bearer boundary-test"},
     )
     assert_protected(response, 401)
+
+
+def test_admission_quota_does_not_bound_invalid_bearer_authentication(monkeypatch):
+    """Document the remaining pre-admission cost, not a DoS-protection claim."""
+
+    class CountingRejectedTokens:
+        calls = 0
+
+        def authenticate(self, _):
+            self.calls += 1
+            return None
+
+    lookup = CountingRejectedTokens()
+    monkeypatch.setattr(app, "store", lookup)
+    client = TestClient(app.app)
+    statuses = [
+        client.get("/api/overview", headers={"Authorization": f"Bearer invalid-{i}"}).status_code
+        for i in range(245)
+    ]
+    assert statuses == [401] * 240 + [429] * 5
+    assert lookup.calls == 245
