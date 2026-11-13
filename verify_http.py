@@ -203,7 +203,9 @@ def main():
                             token,
                             protect=False,
                             content=product(properties),
-                            headers={"Content-Type": "application/json"},
+                            # The old server re-raises after its 500; do not race
+                            # that connection's close when probing the next case.
+                            headers={"Content-Type": "application/json", "Connection": "close"},
                         ).status_code
                     )
                 check(
