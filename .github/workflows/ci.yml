@@ -5,7 +5,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:17
@@ -30,15 +30,36 @@ jobs:
       - run: python export_snapshot.py --verify
       - name: Reconcile a fresh multi-account workload
         run: python verify_workload.py --accounts 2 --originals 40 --output local-evidence/workload-ci.json
-      - name: Verify dated evidence matches executed source
+      - name: Select PostgreSQL 17 backup tools
+        run: |
+          if [ ! -x /usr/lib/postgresql/17/bin/pg_dump ]; then
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client-17
+          fi
+          /usr/lib/postgresql/17/bin/pg_dump --version
+      - name: Repeat interruption and backup restoration on current source
+        run: python verify_release.py --pg-bin /usr/lib/postgresql/17/bin --output local-evidence/release-ci.json
+      - name: Fetch immutable pre-fix source for counterexample reproduction
+        uses: actions/checkout@v4
+        with:
+          ref: 94a4cb1885297442ef59bdcf9fcecc605ff2a97b
+          path: historical-source
+      - name: Exercise real HTTP concurrency and malformed requests
+        run: python verify_http.py --baseline-dir historical-source --output local-evidence/http-ci.json
+      - name: Verify fresh and historical evidence against their own source
         run: |
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
-          report = json.loads(Path('docs/release-2026-11-12.json').read_text())
-          assert report['checks'] and all(row['passed'] for row in report['checks'])
-          for name, expected in report['source_files'].items():
-              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+          for filename, root in [
+              ('docs/release-2026-11-12.json', Path('historical-source')),
+              ('local-evidence/release-ci.json', Path('.')),
+              ('local-evidence/http-ci.json', Path('.')),
+          ]:
+              report = json.loads(Path(filename).read_text())
+              assert report['checks'] and all(row['passed'] for row in report['checks'])
+              for name, expected in report['source_files'].items():
+                  assert hashlib.sha256((root / name).read_bytes()).hexdigest() == expected, name
           workload = json.loads(Path('web/landmark.json').read_text())
           assert workload['checks'] and all(row['passed'] for row in workload['checks'])
           for name, expected in workload['source_files'].items():
@@ -53,7 +74,11 @@ jobs:
         if: always()
         with:
           name: postgres-test-evidence
-          path: tests.xml
+          path: |
+            tests.xml
+            local-evidence/http-ci.json
+            local-evidence/release-ci.json
+            local-evidence/workload-ci.json
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
