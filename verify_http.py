@@ -25,6 +25,32 @@ from psycopg.conninfo import conninfo_to_dict
 from store import Store
 from verify_workload import quantile, sql_totals
 
+BASELINE_COMMIT = "94a4cb1885297442ef59bdcf9fcecc605ff2a97b"
+
+
+def verified_baseline(directory):
+    """Require the advertised immutable checkout, not merely a plausible directory."""
+    directory = Path(directory).resolve()
+
+    def git(*arguments):
+        return subprocess.check_output(["git", "-C", str(directory), *arguments])
+
+    if git("rev-parse", "HEAD").decode().strip() != BASELINE_COMMIT:
+        raise ValueError("Baseline checkout does not match the pinned commit")
+    names = git("ls-tree", "-r", "--name-only", BASELINE_COMMIT).decode().splitlines()
+    hashes = {}
+    for name in names:
+        path = directory / name
+        expected = git("show", BASELINE_COMMIT + ":" + name)
+        if not path.is_file() or path.read_bytes() != expected:
+            raise ValueError("Baseline tracked files differ from the pinned bytes")
+        hashes[name] = hashlib.sha256(expected).hexdigest()
+    known_python = {name for name in names if name.endswith(".py")}
+    actual_python = {path.relative_to(directory).as_posix() for path in directory.rglob("*.py")}
+    if actual_python != known_python:
+        raise ValueError("Baseline contains untracked Python sources that could shadow imports")
+    return directory, hashes
+
 
 def usage(event_id, units=10, **extra):
     return {
@@ -172,7 +198,10 @@ def main():
 
     try:
         if args.baseline_dir:
-            with server(Path(args.baseline_dir).resolve(), url) as client:
+            baseline_directory, baseline_hashes = verified_baseline(args.baseline_dir)
+            report["baseline_commit"] = BASELINE_COMMIT
+            report["baseline_source_files"] = baseline_hashes
+            with server(baseline_directory, url) as client:
                 _, token = sandbox(client, "baseline-sandbox", protect=False)
                 response = request(
                     client,
@@ -213,7 +242,6 @@ def main():
                     failures == [500, 500, 500],
                     "NaN, overflow to infinity, and escaped NUL reach PostgreSQL jsonb; baseline only",
                 )
-                report["baseline_commit"] = "94a4cb1885297442ef59bdcf9fcecc605ff2a97b"
 
         with server(Path.cwd(), url) as client:
             tenant_a, token_a = sandbox(client)
