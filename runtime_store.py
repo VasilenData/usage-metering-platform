@@ -20,10 +20,11 @@ class RuntimeStore(Store):
         if verify:
             with self.connection() as conn:
                 role = conn.execute(
-                    "SELECT current_user AS name,rolsuper,rolcreatedb,rolcreaterole,rolbypassrls FROM pg_roles WHERE rolname=current_user"
+                    "SELECT current_user AS name,rolsuper,rolcreatedb,rolcreaterole,rolbypassrls,rolreplication FROM pg_roles WHERE rolname=current_user"
                 ).fetchone()
                 if role["name"] != "meter_api_runtime" or any(
-                    role[k] for k in ("rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls")
+                    role[k]
+                    for k in ("rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls", "rolreplication")
                 ):
                     raise ValueError("HTTP runtime requires the dedicated restricted meter_api_runtime login")
                 if conn.execute(
@@ -43,9 +44,38 @@ class RuntimeStore(Store):
                 ).fetchone()["unsafe"]:
                     raise ValueError("HTTP runtime has unexpected control-plane table permissions")
                 if conn.execute(
-                    "SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='meter_api' AND p.proowner=(SELECT oid FROM pg_roles WHERE rolname=current_user)"
-                ).fetchone():
-                    raise ValueError("HTTP runtime must not own control functions")
+                    "SELECT has_table_privilege(current_user,'public.tenants','DELETE,TRUNCATE,TRIGGER') AS unsafe"
+                ).fetchone()["unsafe"]:
+                    raise ValueError("HTTP runtime must not modify the account registry")
+                for relation in ("usage_events", "prices", "statements", "product_events"):
+                    if conn.execute(
+                        "SELECT has_table_privilege(current_user,%s,'UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') "
+                        "OR has_any_column_privilege(current_user,%s,'UPDATE,REFERENCES') AS unsafe",
+                        ("public." + relation, "public." + relation),
+                    ).fetchone()["unsafe"]:
+                        raise ValueError("HTTP runtime has unexpected mutable ledger permissions")
+                functions = conn.execute(
+                    "SELECT p.proname,p.proargtypes::text AS arguments,p.prosecdef,p.proconfig,"
+                    "r.rolname,r.rolcanlogin,r.rolsuper,r.rolbypassrls,r.rolreplication "
+                    "FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace "
+                    "JOIN pg_roles r ON r.oid=p.proowner WHERE n.nspname='meter_api' "
+                    "AND has_function_privilege(current_user,p.oid,'EXECUTE')"
+                ).fetchall()
+                expected = {
+                    ("current_tenant", ""),
+                    ("authenticate", "25"),
+                    ("demo_metadata", ""),
+                    ("create_sandbox", "25"),
+                    ("count_duplicate", ""),
+                }
+                if {(f["proname"], f["arguments"]) for f in functions} != expected or any(
+                    not f["prosecdef"]
+                    or f["proconfig"] != ["search_path=pg_catalog"]
+                    or f["rolname"] != "meter_control"
+                    or any(f[k] for k in ("rolcanlogin", "rolsuper", "rolbypassrls", "rolreplication"))
+                    for f in functions
+                ):
+                    raise ValueError("HTTP runtime requires exactly the reviewed control functions")
                 enforced = conn.execute(
                     "SELECT count(*) AS n FROM pg_class WHERE oid IN ('public.usage_events'::regclass,'public.prices'::regclass,'public.statements'::regclass,'public.product_events'::regclass) AND relrowsecurity AND relforcerowsecurity"
                 ).fetchone()["n"]

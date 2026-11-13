@@ -26,6 +26,14 @@ def main():
     if not conninfo_to_dict(admin_url).get("dbname", "").endswith("_test"):
         raise SystemExit("Use a dedicated disposable database ending in _test")
     password = "ci-runtime-disposable-only-20261113"
+    # Simulate schema drift before provisioning: it must not expose an unrelated
+    # SECURITY DEFINER capability when the bootstrap is repeated.
+    with psycopg.connect(admin_url) as conn:
+        conn.execute("CREATE SCHEMA IF NOT EXISTS meter_api")
+        conn.execute(
+            "CREATE OR REPLACE FUNCTION meter_api.unrelated_helper_probe() RETURNS text "
+            "LANGUAGE sql SECURITY DEFINER AS $$ SELECT 'not an HTTP capability'::text $$"
+        )
     admin = bootstrap(admin_url, password)
     runtime_url = make_conninfo(admin_url, user="meter_api_runtime", password=password)
     runtime = RuntimeStore(runtime_url)
@@ -81,6 +89,45 @@ def main():
         else:
             rejected = False
         check("Startup rejects administrative identity", rejected, "Actual PostgreSQL role inspected")
+        for name, grant, revoke in [
+            (
+                "replication role drift",
+                "ALTER ROLE meter_api_runtime REPLICATION",
+                "ALTER ROLE meter_api_runtime NOREPLICATION",
+            ),
+            (
+                "PUBLIC truncate drift",
+                "GRANT TRUNCATE ON public.usage_events TO PUBLIC",
+                "REVOKE TRUNCATE ON public.usage_events FROM PUBLIC",
+            ),
+            (
+                "account delete drift",
+                "GRANT DELETE ON public.tenants TO meter_api_runtime",
+                "REVOKE DELETE ON public.tenants FROM meter_api_runtime",
+            ),
+            (
+                "unexpected helper drift",
+                "GRANT EXECUTE ON FUNCTION meter_api.unrelated_helper_probe() TO meter_api_runtime",
+                "REVOKE EXECUTE ON FUNCTION meter_api.unrelated_helper_probe() FROM meter_api_runtime",
+            ),
+        ]:
+            with admin.admin() as conn:
+                conn.execute(grant)
+            try:
+                try:
+                    RuntimeStore(runtime_url)
+                except ValueError:
+                    rejected = True
+                else:
+                    rejected = False
+            finally:
+                with admin.admin() as conn:
+                    conn.execute(revoke)
+            check(
+                "Startup rejects " + name,
+                rejected,
+                "Actual temporary administrative privilege change, then restored",
+            )
         statements = {
             "create role": "CREATE ROLE meter_forbidden_probe",
             "create schema": "CREATE SCHEMA meter_forbidden_probe",
@@ -88,6 +135,7 @@ def main():
             "assume control role": "SET ROLE meter_control",
             "assume legacy role": "SET ROLE meter_runtime",
             "read token hashes": "SELECT token_hash FROM public.tenants",
+            "invoke unrelated existing helper": "SELECT meter_api.unrelated_helper_probe()",
             "insert price": "INSERT INTO prices(tenant_id,id,effective_from,unit_price_microusd) VALUES('demo','forbidden','2026-01-01',0)",
             "update price": "UPDATE prices SET unit_price_microusd=0",
             "delete ledger": "DELETE FROM usage_events",
@@ -128,21 +176,27 @@ def main():
             "No authenticated disposable tenant exists for the public demo",
         )
         with runtime.connection() as conn:
-            conn.execute("CREATE TEMP TABLE tenants(id text,token_hash text)")
-            conn.execute("INSERT INTO tenants VALUES('shadow','not-a-real-digest')")
+            conn.execute(
+                "CREATE TEMP TABLE tenants(id text,name text,scope text,expires_at timestamptz,duplicate_events bigint,token_hash text)"
+            )
+            conn.execute(
+                "INSERT INTO tenants VALUES('shadow','shadow','disposable-sandbox',now()+interval '1 hour',0,%s)",
+                (hashlib.sha256(token_b.encode()).hexdigest(),),
+            )
+            real_identity = conn.execute("SELECT * FROM meter_api.authenticate(%s)", (token_b,)).fetchone()
             shadow = conn.execute(
                 "SELECT * FROM meter_api.authenticate(%s)", ("x'); DROP TABLE public.tenants; --",)
             ).fetchall()
             functions = conn.execute(
-                "SELECT p.proname,p.prosecdef,p.proconfig,r.rolcanlogin,r.rolsuper FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace JOIN pg_roles r ON r.oid=p.proowner WHERE n.nspname='meter_api'"
+                "SELECT p.proname,p.prosecdef,p.proconfig,r.rolcanlogin,r.rolsuper FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace JOIN pg_roles r ON r.oid=p.proowner WHERE n.nspname='meter_api' AND has_function_privilege(current_user,p.oid,'EXECUTE')"
             ).fetchall()
             public_grants = conn.execute(
                 "SELECT p.proname FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace CROSS JOIN LATERAL aclexplode(p.proacl) a WHERE n.nspname='meter_api' AND a.grantee=0 AND a.privilege_type='EXECUTE'"
             ).fetchall()
         check(
             "Control functions resist temp shadow and token SQL syntax",
-            shadow == [],
-            "Fixed pg_catalog search_path, explicit public relations, parameterized bearer",
+            shadow == [] and real_identity["id"] == account_b["id"],
+            "A matching temporary token row cannot shadow public.tenants; SQL syntax in a parameter remains data",
         )
         check(
             "Control functions have restricted ownership and execution",
@@ -226,6 +280,7 @@ def main():
     finally:
         with admin.admin() as conn:
             conn.execute("DELETE FROM tenants WHERE id=ANY(%s)", ([account_a["id"], account_b["id"]],))
+            conn.execute("DROP FUNCTION meter_api.unrelated_helper_probe()")
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

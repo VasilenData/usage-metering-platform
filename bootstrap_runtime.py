@@ -20,15 +20,18 @@ def bootstrap(admin_url, runtime_password):
             if not conn.execute("SELECT 1 FROM pg_roles WHERE rolname=%s", (role,)).fetchone():
                 conn.execute(
                     sql.SQL(
-                        "CREATE ROLE {} {} NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS"
+                        "CREATE ROLE {} {} NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS NOREPLICATION"
                     ).format(sql.Identifier(role), sql.SQL("LOGIN" if login else "NOLOGIN"))
                 )
             flags = conn.execute(
-                "SELECT rolsuper,rolcreatedb,rolcreaterole,rolbypassrls,rolcanlogin FROM pg_roles WHERE rolname=%s",
+                "SELECT rolsuper,rolcreatedb,rolcreaterole,rolbypassrls,rolreplication,rolcanlogin FROM pg_roles WHERE rolname=%s",
                 (role,),
             ).fetchone()
             if (
-                any(flags[key] for key in ("rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls"))
+                any(
+                    flags[key]
+                    for key in ("rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls", "rolreplication")
+                )
                 or flags["rolcanlogin"] != login
             ):
                 raise ValueError("Existing role has unexpected privilege flags; review it explicitly")

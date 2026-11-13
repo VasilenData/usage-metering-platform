@@ -4,6 +4,7 @@ REVOKE ALL ON SCHEMA meter_api FROM PUBLIC;
 GRANT USAGE ON SCHEMA meter_api TO meter_api_runtime, meter_control;
 GRANT CREATE ON SCHEMA meter_api TO meter_control;
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON public.tenants, public.usage_events, public.prices, public.statements, public.product_events FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM meter_api_runtime;
 GRANT USAGE ON SCHEMA public TO meter_api_runtime, meter_control;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.tenants TO meter_control;
@@ -74,7 +75,10 @@ ALTER FUNCTION meter_api.demo_metadata() OWNER TO meter_control;
 ALTER FUNCTION meter_api.create_sandbox(text) OWNER TO meter_control;
 ALTER FUNCTION meter_api.count_duplicate() OWNER TO meter_control;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA meter_api FROM PUBLIC;
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA meter_api TO meter_api_runtime;
+-- A pre-existing helper must not become an accidental HTTP capability.
+REVOKE ALL ON ALL FUNCTIONS IN SCHEMA meter_api FROM meter_api_runtime;
+GRANT EXECUTE ON FUNCTION meter_api.current_tenant(), meter_api.authenticate(text),
+ meter_api.demo_metadata(), meter_api.create_sandbox(text), meter_api.count_duplicate() TO meter_api_runtime;
 REVOKE CREATE ON SCHEMA meter_api FROM meter_api_runtime, meter_control;
 
 -- app.tenant_id is deliberately ignored. A caller must know the account's
