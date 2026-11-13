@@ -23,17 +23,25 @@ def http_store():
 
 def test_concurrent_first_assignment_is_idempotent(http_store, monkeypatch):
     tenant, token = http_store.create_tenant()
-    monkeypatch.setattr(app, "store", http_store)
-    app.request_times.clear()
-    barrier = threading.Barrier(6)
-    ingest = http_store.ingest_product
+    from psycopg.conninfo import make_conninfo
 
-    def synchronized(tenant_id, body):
+    from bootstrap_runtime import bootstrap
+    from runtime_store import RuntimeStore
+
+    password = "ci-runtime-disposable-only-20261113"
+    bootstrap(http_store.admin_url, password)
+    runtime = RuntimeStore(make_conninfo(http_store.admin_url, user="meter_api_runtime", password=password))
+    monkeypatch.setattr(app, "store", runtime)
+    app.limits.clear()
+    barrier = threading.Barrier(6)
+    ingest = RuntimeStore.ingest_product
+
+    def synchronized(self, tenant_id, body):
         # Every request has observed no prior assignment before any insert occurs.
         barrier.wait(10)
-        return ingest(tenant_id, body)
+        return ingest(self, tenant_id, body)
 
-    monkeypatch.setattr(http_store, "ingest_product", synchronized)
+    monkeypatch.setattr(RuntimeStore, "ingest_product", synchronized)
 
     def request(_):
         client = TestClient(app.app)
@@ -53,7 +61,7 @@ def test_concurrent_first_assignment_is_idempotent(http_store, monkeypatch):
 
 
 def test_chunked_request_without_length_is_still_bounded():
-    app.request_times.clear()
+    app.limits.clear()
     client = TestClient(app.app)
     chunks = (b"x" * 4096 for _ in range(3))
     response = client.post("/api/sandbox", content=chunks)

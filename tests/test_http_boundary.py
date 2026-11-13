@@ -1,5 +1,3 @@
-import time
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -8,9 +6,9 @@ import app
 
 @pytest.fixture(autouse=True)
 def clear_limiter():
-    app.request_times.clear()
+    app.limits.clear()
     yield
-    app.request_times.clear()
+    app.limits.clear()
 
 
 def assert_protected(response, status):
@@ -29,7 +27,8 @@ def test_oversized_requests_keep_security_headers(chunked):
 
 
 def test_rate_limit_keeps_security_headers_and_retry_after():
-    app.request_times.extend([time.monotonic()] * 240)
+    for _ in range(240):
+        assert app.limits.admit("anonymous", "testclient")
     response = TestClient(app.app).get("/api/overview")
     assert_protected(response, 429)
     assert response.headers["retry-after"] == "60"
