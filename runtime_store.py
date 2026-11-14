@@ -62,6 +62,7 @@ class RuntimeStore(Store):
                     "AND has_function_privilege(current_user,p.oid,'EXECUTE')"
                 ).fetchall()
                 expected = {
+                    ("admit_request", "25 25"),
                     ("current_tenant", ""),
                     ("authenticate", "25"),
                     ("demo_metadata", ""),
@@ -76,6 +77,13 @@ class RuntimeStore(Store):
                     for f in functions
                 ):
                     raise ValueError("HTTP runtime requires exactly the reviewed control functions")
+                if conn.execute(
+                    "SELECT has_table_privilege(current_user,'meter_api.admission_windows',"
+                    "'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') OR "
+                    "has_any_column_privilege(current_user,'meter_api.admission_windows',"
+                    "'SELECT,INSERT,UPDATE,REFERENCES') AS unsafe"
+                ).fetchone()["unsafe"]:
+                    raise ValueError("HTTP runtime must not access admission state directly")
                 enforced = conn.execute(
                     "SELECT count(*) AS n FROM pg_class WHERE oid IN ('public.usage_events'::regclass,'public.prices'::regclass,'public.statements'::regclass,'public.product_events'::regclass) AND relrowsecurity AND relforcerowsecurity"
                 ).fetchone()["n"]
@@ -104,7 +112,16 @@ class RuntimeStore(Store):
         if not isinstance(token, str) or not 1 <= len(token) <= 256:
             return None
         with self.connection() as conn:
+            conn.execute("SET LOCAL statement_timeout='5s'")
             return conn.execute("SELECT * FROM meter_api.authenticate(%s)", (token,)).fetchone()
+
+    def admit(self, token, peer):
+        with self.connection() as conn:
+            conn.execute("SET LOCAL statement_timeout='5s'")
+            conn.execute("SET LOCAL lock_timeout='2s'")
+            return conn.execute("SELECT meter_api.admit_request(%s,%s) AS allowed", (token, peer)).fetchone()[
+                "allowed"
+            ]
 
     @contextmanager
     def tenant(self, tenant_id):

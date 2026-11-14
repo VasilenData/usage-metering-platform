@@ -13,6 +13,57 @@ GRANT INSERT ON public.prices TO meter_control;
 -- is available only through the fixed, bounded provisioning function below.
 GRANT SELECT, DELETE ON public.usage_events, public.product_events, public.statements, public.prices TO meter_control;
 
+-- Additive migration: no ledger rewrite and no allowance reset on reprovision.
+-- The runtime cannot read or mutate this private state directly.
+CREATE TABLE IF NOT EXISTS meter_api.admission_windows (
+ kind text NOT NULL CHECK (kind IN ('account','anonymous')),
+ identity_hash text NOT NULL CHECK (identity_hash ~ '^[0-9a-f]{64}$'),
+ hits timestamptz[] NOT NULL CHECK (cardinality(hits) BETWEEN 1 AND 240),
+ last_seen timestamptz NOT NULL,
+ PRIMARY KEY(kind, identity_hash)
+);
+ALTER TABLE meter_api.admission_windows OWNER TO meter_control;
+REVOKE ALL ON meter_api.admission_windows FROM PUBLIC, meter_api_runtime;
+
+CREATE OR REPLACE FUNCTION meter_api.admit_request(bearer text, peer text) RETURNS boolean
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = pg_catalog
+AS $$
+DECLARE account_id text; bucket_kind text; bucket_key text; allowance integer;
+        moment timestamptz; recent timestamptz[];
+BEGIN
+ IF peer IS NULL OR length(peer) NOT BETWEEN 1 AND 128 THEN
+   RAISE EXCEPTION 'Invalid peer identifier' USING ERRCODE='22023';
+ END IF;
+ SELECT t.id INTO account_id FROM public.tenants t
+ WHERE length(bearer) BETWEEN 1 AND 256
+   AND t.token_hash=encode(sha256(convert_to(bearer,'UTF8')),'hex')
+   AND t.scope='disposable-sandbox' AND t.expires_at > clock_timestamp();
+ bucket_kind := CASE WHEN account_id IS NULL THEN 'anonymous' ELSE 'account' END;
+ bucket_key := encode(sha256(convert_to(coalesce(account_id,peer),'UTF8')),'hex');
+ allowance := CASE WHEN account_id IS NULL THEN 240 ELSE 120 END;
+ -- Bounded, short per-kind critical section. A noisy peer cannot hold the
+ -- account-kind lock. This deliberately trades throughput for simple fairness.
+ PERFORM pg_advisory_xact_lock(87326004, CASE WHEN account_id IS NULL THEN 0 ELSE 1 END);
+ moment := clock_timestamp(); -- after waiting: no stale start-of-transaction clock
+ DELETE FROM meter_api.admission_windows w
+ WHERE w.kind=bucket_kind AND w.last_seen <= moment-interval '60 seconds';
+ SELECT ARRAY(SELECT h FROM unnest(w.hits) h WHERE h > moment-interval '60 seconds')
+ INTO recent FROM meter_api.admission_windows w
+ WHERE w.kind=bucket_kind AND w.identity_hash=bucket_key;
+ IF recent IS NULL THEN
+   IF (SELECT count(*) FROM meter_api.admission_windows w WHERE w.kind=bucket_kind) >= 256 THEN
+     RETURN false; -- never evict an active identity to make room
+   END IF;
+   INSERT INTO meter_api.admission_windows VALUES(bucket_kind,bucket_key,ARRAY[moment],moment);
+   RETURN true;
+ END IF;
+ IF cardinality(recent) >= allowance THEN RETURN false; END IF;
+ UPDATE meter_api.admission_windows w SET hits=array_append(recent,moment),last_seen=moment
+ WHERE w.kind=bucket_kind AND w.identity_hash=bucket_key;
+ RETURN true;
+END
+$$;
+
 CREATE OR REPLACE FUNCTION meter_api.current_tenant() RETURNS text
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = pg_catalog
 AS $$
@@ -74,11 +125,13 @@ ALTER FUNCTION meter_api.authenticate(text) OWNER TO meter_control;
 ALTER FUNCTION meter_api.demo_metadata() OWNER TO meter_control;
 ALTER FUNCTION meter_api.create_sandbox(text) OWNER TO meter_control;
 ALTER FUNCTION meter_api.count_duplicate() OWNER TO meter_control;
+ALTER FUNCTION meter_api.admit_request(text,text) OWNER TO meter_control;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA meter_api FROM PUBLIC;
 -- A pre-existing helper must not become an accidental HTTP capability.
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA meter_api FROM meter_api_runtime;
 GRANT EXECUTE ON FUNCTION meter_api.current_tenant(), meter_api.authenticate(text),
- meter_api.demo_metadata(), meter_api.create_sandbox(text), meter_api.count_duplicate() TO meter_api_runtime;
+ meter_api.demo_metadata(), meter_api.create_sandbox(text), meter_api.count_duplicate(),
+ meter_api.admit_request(text,text) TO meter_api_runtime;
 REVOKE CREATE ON SCHEMA meter_api FROM meter_api_runtime, meter_control;
 
 -- app.tenant_id is deliberately ignored. A caller must know the account's

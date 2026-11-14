@@ -248,8 +248,8 @@ def run(admin_url, *, pg_bin=""):
                 ).fetchone()[0]
             check(
                 "No-owner restore actually loses reviewed function ownership",
-                wrong_owners == 5,
-                "Counterexample: five restored control functions belong to the restore administrator",
+                wrong_owners == 6,
+                "Counterexample: six restored control functions belong to the restore administrator",
             )
             target_password = secrets.token_urlsafe(32)
             configure_runtime(target_url, target_password)
@@ -272,13 +272,13 @@ def run(admin_url, *, pg_bin=""):
                 ).fetchone()[0]
                 check(
                     "Restored control ownership and PUBLIC function ACLs hardened",
-                    len(functions) == 5
+                    len(functions) == 6
                     and public_execute == 0
                     and all(
                         f[1:] == (True, ["search_path=pg_catalog"], "meter_control", False, False)
                         for f in functions
                     ),
-                    "Five fixed SECURITY DEFINER functions; NOLOGIN owner; no PUBLIC execution",
+                    "Six fixed SECURITY DEFINER functions; NOLOGIN owner; no PUBLIC execution",
                 )
                 conn.execute(
                     sql.SQL("GRANT CONNECT ON DATABASE {} TO meter_api_runtime").format(
