@@ -68,6 +68,11 @@ jobs:
         with:
           ref: 6f65a5da4c862c6611af4e471eb3e0f4e4de2f63
           path: runtime-evidence-source
+      - name: Fetch source for published runtime restoration evidence
+        uses: actions/checkout@v4
+        with:
+          ref: 3ed2a6fce0a7fc2883789edd57cd919dc5e6b274
+          path: runtime-restore-evidence-source
       - name: Verify fresh and historical evidence against their own source
         run: |
           python - <<'PY'
@@ -80,6 +85,7 @@ jobs:
               ('docs/runtime-security-2026-11-13.json', Path('runtime-evidence-source')),
               ('docs/http-runtime-2026-11-13.json', Path('runtime-evidence-source')),
               ('docs/release-runtime-2026-11-13.json', Path('runtime-evidence-source')),
+              ('docs/runtime-restore-2026-11-14.json', Path('runtime-restore-evidence-source')),
               ('local-evidence/release-ci.json', Path('.')),
               ('local-evidence/http-ci.json', Path('.')),
               ('local-evidence/runtime-ci.json', Path('.')),
