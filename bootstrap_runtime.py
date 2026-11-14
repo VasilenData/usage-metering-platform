@@ -9,11 +9,16 @@ from demo import seed
 from store import Store
 
 
-def bootstrap(admin_url, runtime_password):
+def configure_runtime(admin_url, runtime_password):
+    """Reapply reviewed access without initializing, seeding or rewriting data.
+
+    Used while a restored database is closed to application connections. Roles
+    are cluster-global: run only in the explicitly isolated deployment/test
+    cluster whose runtime credential is being provisioned.
+    """
     if not isinstance(runtime_password, str) or len(runtime_password) < 24:
         raise ValueError("Use a runtime password of at least 24 characters")
-    store = Store(admin_url)
-    seed(store)
+    store = Store(admin_url, initialize=False)
     with store.admin() as conn:
         conn.execute("SELECT pg_advisory_xact_lock(87326003)")
         for role, login in (("meter_control", False), ("meter_api_runtime", True)):
@@ -45,6 +50,14 @@ def bootstrap(admin_url, runtime_password):
         )
         conn.execute(Path(__file__).with_name("runtime_schema.sql").read_text(encoding="utf-8"))
     return store
+
+
+def bootstrap(admin_url, runtime_password):
+    if not isinstance(runtime_password, str) or len(runtime_password) < 24:
+        raise ValueError("Use a runtime password of at least 24 characters")
+    store = Store(admin_url)
+    seed(store)
+    return configure_runtime(admin_url, runtime_password)
 
 
 if __name__ == "__main__":

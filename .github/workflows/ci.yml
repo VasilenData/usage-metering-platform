@@ -56,6 +56,8 @@ jobs:
         run: python verify_http.py --baseline-dir historical-source --output local-evidence/http-ci.json
       - name: Exercise restricted runtime and separate request allowances
         run: python verify_runtime.py --output local-evidence/runtime-ci.json
+      - name: Restore current restricted runtime into a fresh database
+        run: python verify_runtime_restore.py --pg-bin /usr/lib/postgresql/17/bin --output local-evidence/runtime-restore-ci.json
       - name: Fetch source for earlier HTTP evidence
         uses: actions/checkout@v4
         with:
@@ -66,6 +68,11 @@ jobs:
         with:
           ref: 6f65a5da4c862c6611af4e471eb3e0f4e4de2f63
           path: runtime-evidence-source
+      - name: Fetch source for published runtime restoration evidence
+        uses: actions/checkout@v4
+        with:
+          ref: 3ed2a6fce0a7fc2883789edd57cd919dc5e6b274
+          path: runtime-restore-evidence-source
       - name: Verify fresh and historical evidence against their own source
         run: |
           python - <<'PY'
@@ -78,9 +85,11 @@ jobs:
               ('docs/runtime-security-2026-11-13.json', Path('runtime-evidence-source')),
               ('docs/http-runtime-2026-11-13.json', Path('runtime-evidence-source')),
               ('docs/release-runtime-2026-11-13.json', Path('runtime-evidence-source')),
+              ('docs/runtime-restore-2026-11-14.json', Path('runtime-restore-evidence-source')),
               ('local-evidence/release-ci.json', Path('.')),
               ('local-evidence/http-ci.json', Path('.')),
               ('local-evidence/runtime-ci.json', Path('.')),
+              ('local-evidence/runtime-restore-ci.json', Path('.')),
           ]:
               report = json.loads(Path(filename).read_text())
               assert report['checks'] and all(row['passed'] for row in report['checks'])
@@ -106,6 +115,7 @@ jobs:
             local-evidence/release-ci.json
             local-evidence/workload-ci.json
             local-evidence/runtime-ci.json
+            local-evidence/runtime-restore-ci.json
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify

@@ -20,6 +20,7 @@ An API business needs to explain a usage statement when requests are retried, ar
 | Can one account consume another account's request allowance? | Separate authenticated-account and anonymous-peer quotas; real HTTP exercise exhausts A, then requires B to succeed from the same peer. |
 | Do the guarantees survive the actual HTTP boundary? | [Uvicorn/PostgreSQL HTTP exercise](docs/API_RELIABILITY.md): eight concurrent clients, conflicting replays, correction/publication races, expiring credentials and malformed JSON. Raw results are attached to each successful CI run. |
 | Does interruption corrupt the published result? | Synchronized publisher process termination, rollback, replay and `pg_dump` restoration in `verify_release.py`. |
+| Can the current restricted API restart after restoration? | [Fresh-database runtime recovery](docs/RUNTIME_RESTORE.md): closed admission, repaired function ownership/ACLs, complete data fingerprints, real HTTP replay and account-denial checks, then a second process restart. |
 | Does product data justify a launch? | Instrumented browser SDK, assignment/exposure checks, ordered funnel, mature retention cohorts and fixed-horizon decision gates. |
 
 **Latest runtime evidence:** [126 Python tests and 27 runtime acceptance checks](docs/RUNTIME_SECURITY.md#observed-result--13-november-2026), with separate 363-request fairness and 345-request HTTP regression exercises on synthetic GitHub-hosted PostgreSQL.
@@ -65,6 +66,7 @@ python verify_workload.py --accounts 24 --originals 450 --clients 8 --output loc
 python verify_release.py --output local-evidence/release.json
 python verify_http.py --output local-evidence/http.json
 python verify_runtime.py --output local-evidence/runtime.json
+python verify_runtime_restore.py --output local-evidence/runtime-restore.json
 ```
 
 The integration suite requires PostgreSQL and fails when its test database is absent. The release exercise also needs matching-version `pg_dump`/`pg_restore` in PATH, or `--pg-bin /path/to/postgresql/bin`. It creates and drops only a uniquely named disposable restore database. Keep generated dumps private; even this synthetic demonstration has hashed sandbox tokens.
