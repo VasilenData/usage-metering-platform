@@ -1,0 +1,283 @@
+{
+  "generated_at": "2026-11-14T00:31:21.159387+00:00",
+  "source_commit": "3ed2a6fce0a7fc2883789edd57cd919dc5e6b274",
+  "ci_run_id": "43534638977",
+  "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+  "python": "3.12.16",
+  "scope": "Synthetic fresh database on one dedicated PostgreSQL cluster; real loopback Uvicorn",
+  "checks": [
+    {
+      "name": "Fixture has independently calculable statements",
+      "passed": true,
+      "detail": "A: 100 - 20 units at 250 micro-USD; B: 17 at 250"
+    },
+    {
+      "name": "Restored complete data before permission changes",
+      "passed": true,
+      "detail": "All five tables, every column; only counts and digests leave the private exercise"
+    },
+    {
+      "name": "Unhardened restore denies runtime connection",
+      "passed": true,
+      "detail": "New template0 database has no PUBLIC CONNECT; API remains stopped"
+    },
+    {
+      "name": "No-owner restore actually loses reviewed function ownership",
+      "passed": true,
+      "detail": "Counterexample: five restored control functions belong to the restore administrator"
+    },
+    {
+      "name": "Access-only bootstrap preserves all restored data",
+      "passed": true,
+      "detail": "No demo seed, Store initialization or financial-history rewrite in configure_runtime"
+    },
+    {
+      "name": "Restored control ownership and PUBLIC function ACLs hardened",
+      "passed": true,
+      "detail": "Five fixed SECURITY DEFINER functions; NOLOGIN owner; no PUBLIC execution"
+    },
+    {
+      "name": "Current runtime startup gate passes after hardening",
+      "passed": true,
+      "detail": "Actual current role/ACL/function/RLS verification; administrative DSN not given to API"
+    },
+    {
+      "name": "Restored SQL rejects forged account selection",
+      "passed": true,
+      "detail": "A bearer plus B UUID still reads only A; query deliberately omits tenant filter"
+    },
+    {
+      "name": "Restored runtime denied: foreign account insert",
+      "passed": true,
+      "detail": "Actual PostgreSQL insufficient_privilege"
+    },
+    {
+      "name": "Restored runtime denied: price write",
+      "passed": true,
+      "detail": "Actual PostgreSQL insufficient_privilege"
+    },
+    {
+      "name": "Restored runtime denied: role creation",
+      "passed": true,
+      "detail": "Actual PostgreSQL insufficient_privilege"
+    },
+    {
+      "name": "Restored runtime denied: assume control owner",
+      "passed": true,
+      "detail": "Actual PostgreSQL insufficient_privilege"
+    },
+    {
+      "name": "Restored runtime denied: read token hashes",
+      "passed": true,
+      "detail": "Actual PostgreSQL insufficient_privilege"
+    },
+    {
+      "name": "HTTP retains original immutable statements",
+      "passed": true,
+      "detail": "Original IDs, revisions, cutoffs and contents are unchanged; accounts remain separate"
+    },
+    {
+      "name": "HTTP account query cannot cross restored accounts",
+      "passed": true,
+      "detail": "Request identity remains token-derived"
+    },
+    {
+      "name": "Expired bearer is not revived by restore",
+      "passed": true,
+      "detail": "Retained expiry rejects actual HTTP request"
+    },
+    {
+      "name": "Post-restore retries preserve statement identity",
+      "passed": true,
+      "detail": "Retry does not add usage or a financial revision"
+    },
+    {
+      "name": "Restored API publishes a valid new revision",
+      "passed": true,
+      "detail": "Independent fixture total (100 - 20 + 40) * 250 = 30,000 micro-USD; B unchanged"
+    },
+    {
+      "name": "Restored revision reconciles to independent SQL: 3",
+      "passed": true,
+      "detail": "Separately written relational oracle at each immutable statement knowledge cutoff"
+    },
+    {
+      "name": "Restored revision reconciles to independent SQL: 2",
+      "passed": true,
+      "detail": "Separately written relational oracle at each immutable statement knowledge cutoff"
+    },
+    {
+      "name": "Restored revision reconciles to independent SQL: 1",
+      "passed": true,
+      "detail": "Separately written relational oracle at each immutable statement knowledge cutoff"
+    },
+    {
+      "name": "Second runtime restart retains published history",
+      "passed": true,
+      "detail": "Separate Uvicorn process, same restricted DSN; no administrative bootstrap at HTTP startup"
+    },
+    {
+      "name": "Source database remains unchanged",
+      "passed": true,
+      "detail": "Target-only replays/corrections; source five-table digests unchanged"
+    }
+  ],
+  "http_requests": [
+    {
+      "phase": "source",
+      "scenario": "create account",
+      "status": 201
+    },
+    {
+      "phase": "source",
+      "scenario": "create account",
+      "status": 201
+    },
+    {
+      "phase": "source",
+      "scenario": "create account",
+      "status": 201
+    },
+    {
+      "phase": "source",
+      "scenario": "ingest original",
+      "status": 200
+    },
+    {
+      "phase": "source",
+      "scenario": "ingest original",
+      "status": 200
+    },
+    {
+      "phase": "source",
+      "scenario": "A original statement",
+      "status": 200
+    },
+    {
+      "phase": "source",
+      "scenario": "A correction",
+      "status": 200
+    },
+    {
+      "phase": "source",
+      "scenario": "A revised statement",
+      "status": 200
+    },
+    {
+      "phase": "source",
+      "scenario": "B statement",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "A statements",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "B statements",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "forged HTTP account query",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "expired account",
+      "status": 401
+    },
+    {
+      "phase": "restored",
+      "scenario": "retry old usage",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "retry statement",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "foreign correction",
+      "status": 422
+    },
+    {
+      "phase": "restored",
+      "scenario": "late usage",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "new revision",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "complete A history",
+      "status": 200
+    },
+    {
+      "phase": "restored",
+      "scenario": "B unchanged",
+      "status": 200
+    },
+    {
+      "phase": "restart",
+      "scenario": "A history survives process restart",
+      "status": 200
+    }
+  ],
+  "postgresql": "PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "archive": {
+    "bytes": 34130,
+    "sha256": "1ba1dd7965a604f9e6386f1b38abe8f25cb90c36426700c2e631d6b5ae70512b"
+  },
+  "recovery_seconds": 1.656826,
+  "data_before_restore": {
+    "tenants": {
+      "rows": 4,
+      "sha256": "020641aa9b507c06e6b4b2d746ead8f78e1a17dbf0d05c5372da72da4c854f56"
+    },
+    "usage_events": {
+      "rows": 8,
+      "sha256": "21ab535c132014ea0628824f85945ae4e4c7b976f4ad2cd4894aac3da263d08f"
+    },
+    "prices": {
+      "rows": 8,
+      "sha256": "fb9e0d48cf115f580ed0d3c02ab227de437063c4d7c246283506e49d912f0da8"
+    },
+    "product_events": {
+      "rows": 162,
+      "sha256": "3de873c4fd7e1c46c71a566eeef5430b90feb4431b4e32e688166804b0848872"
+    },
+    "statements": {
+      "rows": 5,
+      "sha256": "67b321b9e28d4da579d0088d7ad7477467e5e1e1b08826a5f1886a74202736a6"
+    }
+  },
+  "source_unchanged": true,
+  "source_files": {
+    "verify_runtime_restore.py": "e3d0c502ae133d429590a76597d505dbdb51dc88d8b2225d56976714afaa5f64",
+    "bootstrap_runtime.py": "cd4d0e484ae491acd2222278da9120b6bea5b4596ca34af8874380d5d85d2746",
+    "runtime_schema.sql": "94e324727969b3aa96dbf0e9e82646ebce79d96216b4eeddf4e7e3a38362dbf7",
+    "runtime_store.py": "0a2d3689c7ba3f1b7924c65aa21b490340c84e1a0f210499e01b4be95676b56c",
+    "store.py": "6b7a00f91991c5b18941d6b70fdbf1cbce5def9e1fe025be6ea9eb6aa177b226",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "app.py": "204ed8ae4ee0ec807d9df7402944b95cc8d90b7ba60596362b2ae6bf917c19dc",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "demo.py": "0c7fe8d1dffbb068f6138bb896306843bf27fc227b1bc86fa50a2461be6cd091",
+    "verify_http.py": "87ef0ee59d8308a9e9224452a00024f5c2f9458859b488bcb457c4696079aab8",
+    "verify_workload.py": "6a1f3461f1cd74d0686217ea92d8d73226db370b630bead97f57a68f530f5fff",
+    ".github/workflows/ci.yml": "5aef3d636ffa66e1e03c221cf9b57b91a9798a675f840769ca91293353a91c90"
+  },
+  "limitations": [
+    "Trusted synthetic archive, fresh databases on the same dedicated PostgreSQL cluster; not a cross-cluster role migration.",
+    "Runtime login password is reprovisioned cluster-wide; never run on a cluster shared with active Meterwork applications.",
+    "One local HTTP process; no TLS, public traffic, point-in-time/WAL recovery, power-loss or service availability claim.",
+    "Recovery time includes backup, permission hardening and assertions; one controlled run, not a recovery SLA.",
+    "Only application data at backup time is recovered. Later revocations/writes require a separately governed recovery policy.",
+    "Implementation is AI-assisted; no external security review, independent owner performance or real customer adoption implied."
+  ]
+}
