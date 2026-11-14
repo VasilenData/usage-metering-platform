@@ -8,6 +8,8 @@ An API business needs to explain a usage statement when requests are retried, ar
 
 **Scope:** independent portfolio project. Seeded activity and recovery exercises are synthetic. Statements are non-binding estimates; no payments are collected. This is a bounded demonstrator, not a claim of enterprise-scale billing or real customer adoption.
 
+A per-process quota let one account double its allowance across two API workers. I replaced it with bounded PostgreSQL admission state behind a restricted function, then killed a worker after an independently observed commit and retried through its survivor. The synthetic local exercise passed **32 checks**; a separate 30-second mixed load completed **350 requests with no HTTP errors** across two workers (p95 **199 ms**). [Inspect the measured result, failure proof and limitations](docs/MULTIWORKER.md) · [Raw evidence](docs/multiworker-2026-11-14.json).
+
 ## What to inspect
 
 | Question | Evidence |
@@ -49,7 +51,7 @@ Python 3.12, FastAPI, PostgreSQL 17+, plain JavaScript ES modules, pytest, Hypot
 
 Set separate URL-safe local development `POSTGRES_PASSWORD` and `METER_RUNTIME_PASSWORD` values (the runtime password must be at least 24 characters), then run `docker compose up --build`. Open `http://localhost:8000`. Compose runs an explicit administrative bootstrap job before starting the application. Only the bootstrap receives the administrative DSN; the app receives `METER_RUNTIME_DATABASE_URL` for `meter_api_runtime`. PostgreSQL stays on the private Compose network and only the app binds to loopback.
 
-For a manual installation, run `python bootstrap_runtime.py` in a separate administrative process with `ADMIN_DATABASE_URL` and `METER_RUNTIME_PASSWORD`. Start a clean shell containing only `METER_RUNTIME_DATABASE_URL`, then use `uvicorn app:app --host 127.0.0.1 --port 8000 --no-proxy-headers --no-access-log`. The HTTP process rejects administrative/test DSN environment variables and unsafe PostgreSQL identities. Keep one worker. See [credential boundaries and reproduction](docs/RUNTIME_SECURITY.md) before adapting the launch configuration. Use a dedicated demonstration database; no credentials belong in this repository.
+For a manual installation, run `python bootstrap_runtime.py` in a separate administrative process with `ADMIN_DATABASE_URL` and `METER_RUNTIME_PASSWORD`. Start a clean shell containing only `METER_RUNTIME_DATABASE_URL`, then use `uvicorn app:app --host 127.0.0.1 --port 8000 --no-proxy-headers --no-access-log`. The HTTP process rejects administrative/test DSN environment variables and unsafe PostgreSQL identities. Multiple workers share PostgreSQL admission windows; read the [migration and measured limits](docs/MULTIWORKER.md) before changing worker count. See [credential boundaries and reproduction](docs/RUNTIME_SECURITY.md) before adapting the launch configuration. Use a dedicated demonstration database; no credentials belong in this repository.
 
 ## Verify
 
@@ -67,6 +69,7 @@ python verify_release.py --output local-evidence/release.json
 python verify_http.py --output local-evidence/http.json
 python verify_runtime.py --output local-evidence/runtime.json
 python verify_runtime_restore.py --output local-evidence/runtime-restore.json
+python verify_multiworker.py --phase-seconds 10 --output local-evidence/multiworker.json
 ```
 
 The integration suite requires PostgreSQL and fails when its test database is absent. The release exercise also needs matching-version `pg_dump`/`pg_restore` in PATH, or `--pg-bin /path/to/postgresql/bin`. It creates and drops only a uniquely named disposable restore database. Keep generated dumps private; even this synthetic demonstration has hashed sandbox tokens.

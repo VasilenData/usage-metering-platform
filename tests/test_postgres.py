@@ -290,7 +290,6 @@ def test_http_contract_auth_and_input_validation(store, tenant):
     password = "ci-runtime-disposable-only-20261113"
     bootstrap(store.admin_url, password)
     app.store = RuntimeStore(make_conninfo(store.admin_url, user="meter_api_runtime", password=password))
-    app.limits.clear()
     client = TestClient(app.app)
     token = tenant[1]
     headers = {"Authorization": f"Bearer {token}"}

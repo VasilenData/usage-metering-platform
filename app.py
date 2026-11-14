@@ -20,13 +20,13 @@ from starlette.concurrency import run_in_threadpool
 from analytics import assigned_variant
 from billing import month_bounds
 from demo import overview, run_scenario
-from rate_limits import RateLimits
+from rate_limits import TEMPORARY_DATABASE_ERRORS, DatabaseRateLimits
 from runtime_store import RuntimeStore
 from store import Capacity, Conflict
 
 logger = logging.getLogger("meter")
 store = None
-limits = RateLimits()
+limits = DatabaseRateLimits(lambda: store)
 
 
 @asynccontextmanager
@@ -38,7 +38,6 @@ async def lifespan(application):
     ):
         raise ValueError("HTTP process must not receive an administrative DATABASE_URL")
     store = RuntimeStore(os.environ["METER_RUNTIME_DATABASE_URL"])
-    limits.clear()
     yield
 
 
@@ -159,8 +158,18 @@ async def protections(request: Request, call_next):
     if request.url.path.startswith("/api/"):
         peer = request.client.host if request.client else "unknown"
 
-        def invalid(status, detail):
-            if not limits.admit("anonymous", peer):
+        def unavailable():
+            return protected(
+                JSONResponse(
+                    {"detail": "Admission temporarily unavailable"}, 503, headers={"Retry-After": "2"}
+                )
+            )
+
+        async def invalid(status, detail):
+            allowed = await run_in_threadpool(limits.admit, "anonymous", peer)
+            if allowed is None:
+                return unavailable()
+            if not allowed:
                 return protected(
                     JSONResponse(
                         {"detail": "Request allowance exhausted; retry in one minute"},
@@ -175,15 +184,15 @@ async def protections(request: Request, call_next):
             if size < 0:
                 raise ValueError("Negative content length")
         except ValueError:
-            return invalid(400, "Invalid content length")
+            return await invalid(400, "Invalid content length")
         if size > 8192:
-            return invalid(413, "Request exceeds 8KB")
+            return await invalid(413, "Request exceeds 8KB")
         chunks = []
         received = 0
         async for chunk in request.stream():
             received += len(chunk)
             if received > 8192:
-                return invalid(413, "Request exceeds 8KB")
+                return await invalid(413, "Request exceeds 8KB")
             chunks.append(chunk)
         # Starlette's cached request replays this bounded body to call_next.
         request._body = b"".join(chunks)
@@ -191,14 +200,20 @@ async def protections(request: Request, call_next):
             try:
                 validate_json_body(request._body)
             except (ValueError, UnicodeError, RecursionError):
-                return invalid(422, "Invalid or unsupported JSON body")
+                return await invalid(422, "Invalid or unsupported JSON body")
         header = request.headers.get("authorization", "")
         token = header[7:] if header.startswith("Bearer ") else None
-        tenant = await run_in_threadpool(store.authenticate, token) if token else None
+        try:
+            tenant = await run_in_threadpool(store.authenticate, token) if token else None
+        except TEMPORARY_DATABASE_ERRORS:
+            return unavailable()
         kind = "account" if tenant else "anonymous"
         # Forwarded headers are deliberately ignored: no trusted proxy is configured.
         key = tenant["id"] if tenant else (request.client.host if request.client else "unknown")
-        if not limits.admit(kind, key):
+        allowed = await run_in_threadpool(limits.admit, kind, key, token=token, peer=peer)
+        if allowed is None:
+            return unavailable()
+        if not allowed:
             return protected(
                 JSONResponse(
                     {"detail": "Request allowance exhausted; retry in one minute"},

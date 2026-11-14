@@ -21,7 +21,7 @@ A restored ledger is not sufficient evidence that its application can restart sa
 
 1. Create a fresh source fixture with the real restricted API. Account A publishes an original statement and a correction; B publishes a separate statement. Expire a third account and stop the source API.
 2. Capture a custom-format backup. Create an independent destination from `template0`, revoke PUBLIC `CONNECT`, and restore with `--no-owner --no-acl --exit-on-error --single-transaction`. Runtime admission remains closed.
-3. Prove the negative case: the runtime cannot connect, and all five restored control functions are owned by the restoring administrator rather than the reviewed `meter_control` owner.
+3. Prove the negative case: the runtime cannot connect, and all reviewed restored control functions are owned by the restoring administrator rather than the reviewed `meter_control` owner.
 4. Call the new **access-only** `configure_runtime` path. It reinstates the fixed functions' owner, search path, explicit execution grants and token-derived policies. It does not run `Store` initialization, seed fixtures or alter financial history. Hash every column of all five data tables before and after this step; require exact equality, including account metadata and token digests. Values remain private; evidence includes only row counts and fingerprints.
 5. Inspect function ownership and PUBLIC ACLs administratively, grant destination `CONNECT` to the restricted login, and require the existing `RuntimeStore` startup checks to pass. Start a new actual API process with only its runtime DSN; no administrative/test DSN or bootstrap password is inherited by that child.
 6. Verify original statement IDs, contents and cutoffs, token-derived account separation, expired-token denial, idempotent replay, rejected foreign correction and a new valid revision. Reconcile each A revision using independent SQL at its original knowledge cutoff. Restart the API once more and require unchanged history.
@@ -34,7 +34,7 @@ The new entry point is [verify_runtime_restore.py](../verify_runtime_restore.py)
 |---|---|
 | Complete data | All five tables' row counts and every-column fingerprints equal the source immediately after restore and after access configuration. |
 | Initial admission | Restored destination denies runtime connection before permission hardening; source login/HTTP was demonstrably working. |
-| Definer ownership | Five fixed functions have `meter_control` NOLOGIN nonsuperuser ownership, `search_path=pg_catalog`, and no PUBLIC execution. |
+| Definer ownership | The original five functions (six after the [shared-admission upgrade](MULTIWORKER.md)) have `meter_control` NOLOGIN nonsuperuser ownership, `search_path=pg_catalog`, and no PUBLIC execution. |
 | Direct SQL | An A token with B's UUID and an unfiltered query reads only A. Foreign inserts, price updates, role creation, control-role assumption and token-hash reads return actual privilege errors. |
 | HTTP | Original A/B histories remain separate; a forged query selector still reads A; the expired account receives 401; a foreign correction receives 422. |
 | Financial continuity | A's original 100-unit/25,000-micro-USD statement and 80-unit/20,000 revision survive. Retrying old usage creates no new revision. A late 40 units produces revision 3 with 120 units/30,000 micro-USD; B remains 4,250 micro-USD. |

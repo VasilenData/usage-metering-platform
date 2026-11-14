@@ -517,17 +517,23 @@ def main():
                 "account_c_balance": 0,
             }
 
-        # A fresh single process exercises the limiter without disabling or raising it.
-        with server(Path.cwd(), runtime_url, runtime=True) as client:
-            started = time.monotonic()
-            responses = [request(client, "rate-limit", "GET", "/api/overview") for _ in range(241)]
-            check(
-                "Anonymous-peer limiter rejects request 241",
-                time.monotonic() - started < 60
-                and Counter(r.status_code for r in responses) == {401: 240, 429: 1}
-                and responses[-1].headers.get("retry-after") == "60",
-                "Fresh Uvicorn process, 240 permitted unauthenticated requests from one peer then one 429; account allowances are separate",
-            )
+        # A fresh database (not merely a process) gives this independent quota
+        # scenario its own persisted allowance without clearing live state.
+        from verify_runtime_restore import fresh_database
+
+        with fresh_database(url, closed=False) as quota_url:
+            bootstrap(quota_url, password)
+            quota_runtime = make_conninfo(quota_url, user="meter_api_runtime", password=password)
+            with server(Path.cwd(), quota_runtime, runtime=True) as client:
+                started = time.monotonic()
+                responses = [request(client, "rate-limit", "GET", "/api/overview") for _ in range(241)]
+                check(
+                    "Anonymous-peer limiter rejects request 241",
+                    time.monotonic() - started < 60
+                    and Counter(r.status_code for r in responses) == {401: 240, 429: 1}
+                    and responses[-1].headers.get("retry-after") == "60",
+                    "Fresh isolated database, 240 permitted unauthenticated requests from one peer then one 429; account allowances are separate",
+                )
         current = [r for r in records if not r["scenario"].startswith("baseline-")]
         durations = [r["seconds"] for r in current if r["scenario"] != "rate-limit"]
         report["summary"] = {

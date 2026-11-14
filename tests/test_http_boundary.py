@@ -5,10 +5,12 @@ import app
 
 
 @pytest.fixture(autouse=True)
-def clear_limiter():
-    app.limits.clear()
-    yield
-    app.limits.clear()
+def local_parser_limiter(monkeypatch):
+    # Parser/header unit tests use a local reference double; live shared quotas
+    # are exercised against PostgreSQL in test_rate_limits and verify_multiworker.
+    from rate_limits import RateLimits
+
+    monkeypatch.setattr(app, "limits", RateLimits())
 
 
 def assert_protected(response, status):
@@ -32,6 +34,32 @@ def test_rate_limit_keeps_security_headers_and_retry_after():
     response = TestClient(app.app).get("/api/overview")
     assert_protected(response, 429)
     assert response.headers["retry-after"] == "60"
+
+
+@pytest.mark.parametrize("boundary", ["authentication", "admission"])
+def test_temporary_database_error_fails_closed_with_protected_503(boundary, monkeypatch):
+    import psycopg
+
+    from rate_limits import DatabaseRateLimits
+
+    class UnavailableStore:
+        def authenticate(self, _):
+            if boundary == "authentication":
+                raise psycopg.OperationalError("private connection details must not escape")
+            return {"id": "account"}
+
+        def admit(self, *_):
+            raise psycopg.errors.LockNotAvailable("private lock details must not escape")
+
+        def scoped(self, *_):
+            pytest.fail("An unavailable database must prevent endpoint work")
+
+    monkeypatch.setattr(app, "store", UnavailableStore())
+    monkeypatch.setattr(app, "limits", DatabaseRateLimits(lambda: app.store))
+    response = TestClient(app.app).post("/api/usage", json={}, headers={"Authorization": "Bearer test"})
+    assert_protected(response, 503)
+    assert response.headers["retry-after"] == "2"
+    assert response.json() == {"detail": "Admission temporarily unavailable"}
 
 
 @pytest.mark.parametrize("length", ["invalid", "-1"])

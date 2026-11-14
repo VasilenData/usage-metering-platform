@@ -1,8 +1,30 @@
-"""Bounded per-account and anonymous-peer sliding windows for one app process."""
+"""PostgreSQL admission adapter and historical local limiter for comparison tests."""
 
 import threading
 import time
 from collections import deque
+
+import psycopg
+
+TEMPORARY_DATABASE_ERRORS = (
+    psycopg.OperationalError,
+    psycopg.errors.QueryCanceled,
+    psycopg.errors.LockNotAvailable,
+)
+
+
+class DatabaseRateLimits:
+    def __init__(self, get_store):
+        self.get_store = get_store
+
+    def admit(self, kind, identity, *, token=None, peer=None):
+        # Account identity is re-derived from bearer in PostgreSQL, never trusted
+        # from a UUID/query/header. Anonymous callers pass the actual socket peer.
+        try:
+            return self.get_store().admit(token if kind == "account" else None, peer or identity)
+        except TEMPORARY_DATABASE_ERRORS:
+            # Fail closed. No endpoint work runs if admission cannot commit.
+            return None
 
 
 class RateLimits:
@@ -18,7 +40,7 @@ class RateLimits:
         with self.lock:
             self.buckets.clear()
 
-    def admit(self, kind, identity):
+    def admit(self, kind, identity, **_):
         if kind not in {"account", "anonymous"}:
             raise ValueError("Unknown limiter scope")
         key = (kind, identity)

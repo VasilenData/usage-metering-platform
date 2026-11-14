@@ -32,7 +32,6 @@ def test_concurrent_first_assignment_is_idempotent(http_store, monkeypatch):
     bootstrap(http_store.admin_url, password)
     runtime = RuntimeStore(make_conninfo(http_store.admin_url, user="meter_api_runtime", password=password))
     monkeypatch.setattr(app, "store", runtime)
-    app.limits.clear()
     barrier = threading.Barrier(6)
     ingest = RuntimeStore.ingest_product
 
@@ -60,8 +59,10 @@ def test_concurrent_first_assignment_is_idempotent(http_store, monkeypatch):
             conn.execute("DELETE FROM tenants WHERE id=%s", (tenant["id"],))
 
 
-def test_chunked_request_without_length_is_still_bounded():
-    app.limits.clear()
+def test_chunked_request_without_length_is_still_bounded(monkeypatch):
+    from rate_limits import RateLimits
+
+    monkeypatch.setattr(app, "limits", RateLimits())
     client = TestClient(app.app)
     chunks = (b"x" * 4096 for _ in range(3))
     response = client.post("/api/sandbox", content=chunks)

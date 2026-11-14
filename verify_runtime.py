@@ -200,7 +200,7 @@ def main():
         )
         check(
             "Control functions have restricted ownership and execution",
-            len(functions) == 5
+            len(functions) == 6
             and not public_grants
             and all(
                 f["prosecdef"]
@@ -209,7 +209,7 @@ def main():
                 and not f["rolsuper"]
                 for f in functions
             ),
-            "Five fixed SECURITY DEFINER functions; NOLOGIN nonsuperuser owner; no PUBLIC execution",
+            "Six fixed SECURITY DEFINER functions; NOLOGIN nonsuperuser owner; no PUBLIC execution",
         )
 
         with server(Path.cwd(), runtime_url, runtime=True) as client:
@@ -272,7 +272,7 @@ def main():
         }
         result["limitations"] = [
             "Bearer possession authorizes that account; app-host compromise can observe active bearers.",
-            "One-process in-memory admission quotas, not a distributed gateway or denial-of-service guarantee.",
+            "PostgreSQL-shared admission quotas; this fixture uses one worker and is not a denial-of-service guarantee.",
             "Anonymous clients behind one peer share its quota; sandbox capacity remains globally bounded to 64.",
             "Administrative fixture tools intentionally retain admin capabilities outside the HTTP process.",
             "Synthetic CI security checks are not an external penetration test or real adoption evidence.",
@@ -288,4 +288,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    from verify_runtime_restore import fresh_database
+
+    with fresh_database(os.environ["TEST_DATABASE_URL"], closed=False) as isolated_url:
+        os.environ["TEST_DATABASE_URL"] = isolated_url
+        main()

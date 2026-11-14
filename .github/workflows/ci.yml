@@ -58,6 +58,10 @@ jobs:
         run: python verify_runtime.py --output local-evidence/runtime-ci.json
       - name: Restore current restricted runtime into a fresh database
         run: python verify_runtime_restore.py --pg-bin /usr/lib/postgresql/17/bin --output local-evidence/runtime-restore-ci.json
+      - name: Fetch immutable pre-shared-quota source
+        run: git fetch --no-tags origin d4a9d852ea2bfe7c28589daea9a5a946f07279bf
+      - name: Exercise shared admission, response loss and sustained two-worker load
+        run: python verify_multiworker.py --phase-seconds 10 --output local-evidence/multiworker-ci.json
       - name: Fetch source for earlier HTTP evidence
         uses: actions/checkout@v4
         with:
@@ -90,6 +94,7 @@ jobs:
               ('local-evidence/http-ci.json', Path('.')),
               ('local-evidence/runtime-ci.json', Path('.')),
               ('local-evidence/runtime-restore-ci.json', Path('.')),
+              ('local-evidence/multiworker-ci.json', Path('.')),
           ]:
               report = json.loads(Path(filename).read_text())
               assert report['checks'] and all(row['passed'] for row in report['checks'])
@@ -116,6 +121,7 @@ jobs:
             local-evidence/workload-ci.json
             local-evidence/runtime-ci.json
             local-evidence/runtime-restore-ci.json
+            local-evidence/multiworker-ci.json
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
