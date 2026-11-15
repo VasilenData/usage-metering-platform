@@ -27,6 +27,8 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
       - run: pytest -q --junitxml=tests.xml
+      - name: Verify the local starter through real HTTP and independent SQL
+        run: python -m starter.verify
       - run: python export_snapshot.py --verify
       - name: Reconcile a fresh multi-account workload
         run: python verify_workload.py --accounts 2 --originals 40 --output local-evidence/workload-ci.json
@@ -105,6 +107,8 @@ jobs:
               ('local-evidence/runtime-restore-ci.json', Path('.')),
               ('local-evidence/multiworker-ci.json', Path('.')),
               ('local-evidence/request-recovery-ci.json', Path('.')),
+              ('local-evidence/starter.json', Path('.')),
+              ('docs/starter-2026-11-15.json', Path('.')),
               ('docs/request-recovery-2026-11-15.json', Path('.')),
               ('local-evidence/finance-export-ci/report.json', Path('.')),
               ('web/finance-bridge/report.json', Path('published-evidence-source')),
@@ -137,9 +141,69 @@ jobs:
             local-evidence/multiworker-ci.json
             local-evidence/request-recovery-ci.json
             local-evidence/finance-export-ci/
+            local-evidence/starter.json
+  compose-first-use:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Diagnose and create local-only development credentials
+        run: |
+          python -m starter.local doctor
+          python -m starter.local setup
+          python - <<'PY'
+          from pathlib import Path
+          from starter.local import credentials
+          before = Path('.env').read_bytes()
+          credentials()
+          assert Path('.env').read_bytes() == before
+          print('Repeated setup preserved private credential bytes.')
+          PY
+      - name: Start the documented Compose stack
+        run: python -m starter.local up
+      - name: Complete and repeat the API journey
+        run: |
+          python -m starter.client
+          python - <<'PY'
+          from starter.client import run
+          from pathlib import Path
+          path = Path('.meterwork/first-use/result.json')
+          before = path.read_bytes()
+          run()
+          assert path.read_bytes() == before
+          print('Repeated journey preserved both statement IDs and all export bytes.')
+          PY
+      - name: Stop and restart with retained data
+        run: |
+          python -m starter.local stop
+          python -m starter.local start
+          python -m starter.client
+      - name: Produce a private backup and validate the archive
+        run: |
+          python -m starter.local backup
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          backup, = Path('.meterwork/backups').glob('*.dump')
+          with backup.open('rb') as source:
+              result = subprocess.run(['docker', 'compose', 'exec', '-T', 'postgres', 'pg_restore', '--list'], stdin=source, capture_output=True)
+          assert result.returncode == 0
+          print('Private PostgreSQL archive is readable; backup bytes are not uploaded.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: starter-compose-result
+          path: .meterwork/first-use/result.json
+          include-hidden-files: true
+      - name: Stop the isolated CI project
+        if: always()
+        run: docker compose stop
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: verify
+    needs: [verify, compose-first-use]
     runs-on: ubuntu-latest
     permissions:
       contents: read
