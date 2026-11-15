@@ -1,0 +1,309 @@
+{
+  "generated_at": "2026-11-15T00:00:46.250680+00:00",
+  "scope": "Synthetic local PostgreSQL and real loopback HTTP; no production billing or customer use",
+  "source_commit": "local-uncommitted",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.14",
+  "checks": [
+    {
+      "name": "A baseline hand calculation",
+      "passed": true,
+      "detail": "90,003*250 + 60,005*200 = 34,501,750 microUSD"
+    },
+    {
+      "name": "B baseline hand calculation",
+      "passed": true,
+      "detail": "99,999*200 = 19,999,800 microUSD"
+    },
+    {
+      "name": "HTTP usage retry is idempotent",
+      "passed": true,
+      "detail": "Same event identity and payload"
+    },
+    {
+      "name": "Statement retry is immutable",
+      "passed": true,
+      "detail": "Same statement ID, revision, knowledge cutoff and amount"
+    },
+    {
+      "name": "Bundle retry is byte identical",
+      "passed": true,
+      "detail": "All four file bytes identical after an HTTP event and statement retry"
+    },
+    {
+      "name": "Immutable publication accepts exact replay",
+      "passed": true,
+      "detail": "No replacement or new revision"
+    },
+    {
+      "name": "A correction hand calculation",
+      "passed": true,
+      "detail": "34,501,750 - 10,001*250 + 4,007*250 = 33,003,250 microUSD"
+    },
+    {
+      "name": "Export is exact API statement history",
+      "passed": true,
+      "detail": "All three revisions, no derived substitute"
+    },
+    {
+      "name": "Prior revision bytes remain unchanged",
+      "passed": true,
+      "detail": "Bundle 002 contains A1, A2 and B1 cumulatively"
+    },
+    {
+      "name": "Correction delta is fully explained",
+      "passed": true,
+      "detail": "Correction -2,500,250 plus late usage 1,001,750 = -1,498,500 microUSD"
+    },
+    {
+      "name": "Rounded invoice change preserves remainder",
+      "passed": true,
+      "detail": "-150 cents*10,000 + 1,500 microUSD = -1,498,500 microUSD"
+    },
+    {
+      "name": "Wrong bearer/account export is denied",
+      "passed": true,
+      "detail": "Read through restricted runtime and tenant guard"
+    },
+    {
+      "name": "Interrupted export preserves prior published bundle",
+      "passed": true,
+      "detail": "Injected exception at complete staging boundary; no partial directory visible"
+    },
+    {
+      "name": "Source bytes unchanged during exercise",
+      "passed": true,
+      "detail": "All top-level Python and SQL sources fingerprinted before and after the run"
+    }
+  ],
+  "http_requests": [
+    {
+      "scenario": "create customer_a sandbox",
+      "status": 201
+    },
+    {
+      "scenario": "create customer_b sandbox",
+      "status": 201
+    },
+    {
+      "scenario": "A original usage",
+      "status": 200
+    },
+    {
+      "scenario": "A new-price usage",
+      "status": 200
+    },
+    {
+      "scenario": "B usage",
+      "status": 200
+    },
+    {
+      "scenario": "A initial statement",
+      "status": 200
+    },
+    {
+      "scenario": "B initial statement",
+      "status": 200
+    },
+    {
+      "scenario": "duplicate usage delivery",
+      "status": 200
+    },
+    {
+      "scenario": "repeat statement publication",
+      "status": 200
+    },
+    {
+      "scenario": "A late correction",
+      "status": 200
+    },
+    {
+      "scenario": "A late original",
+      "status": 200
+    },
+    {
+      "scenario": "A corrected statement",
+      "status": 200
+    },
+    {
+      "scenario": "A immutable statement history",
+      "status": 200
+    },
+    {
+      "scenario": "B immutable statement history",
+      "status": 200
+    }
+  ],
+  "postgresql": "PostgreSQL 17.11 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+  "bundles": {
+    "bundle-001": {
+      "bundle_sha256": "4184aa74c344fe617b985d0701a263748e1ee6c0234ce1f2ff617c264fa15155",
+      "contract_version": "meterwork-finance/v1",
+      "currency": "USD",
+      "expected_account_months": [
+        {
+          "account_id": "5b6833f6-f687-469f-a266-8ab5cec1fea0",
+          "month": "2026-10",
+          "revision_count": 1
+        },
+        {
+          "account_id": "b288e913-6aa7-4517-911b-eb48961a993c",
+          "month": "2026-10",
+          "revision_count": 1
+        }
+      ],
+      "export_sequence": 1,
+      "files": {
+        "accounts.json": {
+          "rows": 2,
+          "sha256": "a36c672208960aaf7235e3d1ab6678ccedf1fae882bfd39a465cf8fd3d16f80a"
+        },
+        "source_snapshots.json": {
+          "rows": 2,
+          "sha256": "e89c001d8ecb73e5a1c48a574b5ec24b40254586306732e2a820d085e9ed9267"
+        },
+        "statements.json": {
+          "rows": 2,
+          "sha256": "732f44674162690f44756a55527e3aa3ec173f2732706eb81cdaee6aa70d7898"
+        }
+      },
+      "invoice_money_unit": "USD_cent",
+      "previous_bundle_sha256": null,
+      "rounding": "statement_total_half_up",
+      "scope": "synthetic-local",
+      "source_cutoff_utc": "2026-11-15T00:00:57.904106+00:00",
+      "statement_money_unit": "microUSD",
+      "stream_id": "meterwork-finance-synthetic-v1"
+    },
+    "bundle-002": {
+      "bundle_sha256": "ebee6450f78edcf8e91f23c7d4f61967cf62a7b62045f0948e0c9505867c2c29",
+      "contract_version": "meterwork-finance/v1",
+      "currency": "USD",
+      "expected_account_months": [
+        {
+          "account_id": "5b6833f6-f687-469f-a266-8ab5cec1fea0",
+          "month": "2026-10",
+          "revision_count": 1
+        },
+        {
+          "account_id": "b288e913-6aa7-4517-911b-eb48961a993c",
+          "month": "2026-10",
+          "revision_count": 2
+        }
+      ],
+      "export_sequence": 2,
+      "files": {
+        "accounts.json": {
+          "rows": 2,
+          "sha256": "a36c672208960aaf7235e3d1ab6678ccedf1fae882bfd39a465cf8fd3d16f80a"
+        },
+        "source_snapshots.json": {
+          "rows": 2,
+          "sha256": "3d39eccbf62dc29d63daa384c1c4656d3cc65e1c60fcd8b8c66a44a827d3a0e3"
+        },
+        "statements.json": {
+          "rows": 3,
+          "sha256": "da8e1c3638da2c8281c157d511fa1e4b43374110ac9bb0d02c8d9282a7699905"
+        }
+      },
+      "invoice_money_unit": "USD_cent",
+      "previous_bundle_sha256": "4184aa74c344fe617b985d0701a263748e1ee6c0234ce1f2ff617c264fa15155",
+      "rounding": "statement_total_half_up",
+      "scope": "synthetic-local",
+      "source_cutoff_utc": "2026-11-15T00:00:58.751057+00:00",
+      "statement_money_unit": "microUSD",
+      "stream_id": "meterwork-finance-synthetic-v1"
+    }
+  },
+  "correction_bridge": {
+    "tenant_id": "b288e913-6aa7-4517-911b-eb48961a993c",
+    "month": "2026-10",
+    "currency": "USD",
+    "before_id": "6bb78ed0-cc3b-4fc4-ab5c-ba3afd18fc45",
+    "after_id": "4258e33d-1f45-4d68-b52b-685d6d1cb8e9",
+    "before_revision": 1,
+    "after_revision": 2,
+    "before_amount_microusd": 34501750,
+    "after_amount_microusd": 33003250,
+    "delta_units": -5994,
+    "delta_amount_microusd": -1498500,
+    "summary": {
+      "late_usage": {
+        "lines": 1,
+        "delta_units": 4007,
+        "delta_amount_microusd": 1001750
+      },
+      "usage_correction": {
+        "lines": 1,
+        "delta_units": -10001,
+        "delta_amount_microusd": -2500250
+      },
+      "price_change": {
+        "lines": 0,
+        "delta_units": 0,
+        "delta_amount_microusd": 0
+      }
+    },
+    "changes": [
+      {
+        "source": "http-exercise",
+        "event_id": "a-correction",
+        "reason": "usage_correction",
+        "delta_units": -10001,
+        "delta_amount_microusd": -2500250,
+        "before_amount_microusd": 0,
+        "after_amount_microusd": -2500250,
+        "before_price_version": null,
+        "after_price_version": "standard-v1"
+      },
+      {
+        "source": "http-exercise",
+        "event_id": "a-late",
+        "reason": "late_usage",
+        "delta_units": 4007,
+        "delta_amount_microusd": 1001750,
+        "before_amount_microusd": 0,
+        "after_amount_microusd": 1001750,
+        "before_price_version": null,
+        "after_price_version": "standard-v1"
+      }
+    ],
+    "attribution": "New events at the new revision price; existing-event repricing separately."
+  },
+  "rounding": {
+    "customer_a_revision_1": {
+      "invoice_cents": 3450,
+      "rounding_residual_microusd": 1750
+    },
+    "customer_a_revision_2": {
+      "invoice_cents": 3300,
+      "rounding_residual_microusd": 3250
+    },
+    "customer_b_revision_1": {
+      "invoice_cents": 2000,
+      "rounding_residual_microusd": -200
+    }
+  },
+  "source_files": {
+    "analytics.py": "ea1e05225b5a63a13c2f68c17fcc211ee2bf8704b8baa0bd3a4a7b765eb49a2d",
+    "app.py": "7343b682c8abdb8f4fe6037e9121116d3e3a4f4c1ef156cb079d4c2d3e7b58ce",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "bootstrap_runtime.py": "cd4d0e484ae491acd2222278da9120b6bea5b4596ca34af8874380d5d85d2746",
+    "demo.py": "0c7fe8d1dffbb068f6138bb896306843bf27fc227b1bc86fa50a2461be6cd091",
+    "export_snapshot.py": "e31da3eda608b89013f388b4fbb8f1bab8d06c5d52dbe95471ca64643c50bcaa",
+    "finance_export.py": "3fdaa0cdf587ba5148323d504316c4d5162cd050facd0ecf1361ec87a803a425",
+    "rate_limits.py": "49aed5c9673ed6938d9893ac0452f8ebd47302457af518ce85602a21a1a7afa5",
+    "runtime_schema.sql": "4c6834c19f9e93451b9528e2628adc34123c3d51144fb1164062d0624d4de1b3",
+    "runtime_store.py": "4d8956f9f6957198edb391be004af788f990ef9f42932817c7ee0ee5810ebdb4",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "statement_diff.py": "db8cbc731e6e1d1658a9cbe3e55151adf468e34cd76b4bdab527c9499286e093",
+    "store.py": "6b7a00f91991c5b18941d6b70fdbf1cbce5def9e1fe025be6ea9eb6aa177b226",
+    "verify_finance_export.py": "ff2b3ee4b9c536f167648287e2b3eb2e8bacb819604107b465a12fd598f31406",
+    "verify_http.py": "98131ed05af83c7a009fd4e19b3b7f5347b879fde24f0cf8f028e4cc7fd79d3b",
+    "verify_multiworker.py": "a5c3a062369846dba801c0f3e154a5609c9c560d4f1c5367b0967d6cd41d4691",
+    "verify_release.py": "83d9eb9f0020186535b0cb2f5054a9e409b1b4c0ffaeeb038dde5fdd987b41f8",
+    "verify_runtime.py": "6ea9a2f11dc48e765fccc496ee2fffe763ca26ee21c7978530d782d377c1e0ce",
+    "verify_runtime_restore.py": "0fee1814e9e048430a2b8b8a97669dc0063c5c4ca3271d3c1360f3e563d80528",
+    "verify_workload.py": "6a1f3461f1cd74d0686217ea92d8d73226db370b630bead97f57a68f530f5fff"
+  }
+}
