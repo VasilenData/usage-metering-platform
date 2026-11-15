@@ -1,8 +1,10 @@
 # Meterwork
 
+![Meterwork: a changed charge, fully explained. Read-only demo with synthetic billing data.](project-cover.svg)
+
 **Explain a changed usage statement, down to the event and the price known at publication.**
 
-[View the result](https://vasilendata.github.io/usage-metering-platform/#reconciliation) · [Inspect the case study](docs/LANDMARK.md) · [Run the independent reconciliation](verify_workload.py)
+[View the result](https://vasilendata.github.io/usage-metering-platform/#reconciliation) · [Inspect the reliability proof](docs/MULTIWORKER.md) · [Read the case study](docs/LANDMARK.md) · [Run the independent reconciliation](verify_workload.py)
 
 An API business needs to explain a usage statement when requests are retried, arrive late, or are corrected. Meterwork records immutable usage, applies effective-dated prices, and publishes traceable statement revisions. Its instrumented sandbox also measures signup, activation, API usage and a fixed-protocol onboarding experiment.
 
