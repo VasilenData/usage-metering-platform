@@ -1,0 +1,5 @@
+{
+  "month": "2026-10",
+  "original": {"id": "starter-original-v1", "source": "meterwork-starter", "occurred_at": "2026-10-03T12:00:00Z", "units": 12000, "correction_of": null},
+  "correction": {"id": "starter-correction-v1", "source": "meterwork-starter", "occurred_at": "2026-10-03T12:00:00Z", "units": -2000, "correction_of": "starter-original-v1"}
+}

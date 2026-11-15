@@ -4,6 +4,7 @@ __pycache__/
 .hypothesis/
 .ruff_cache/
 .env
+.meterwork/
 *.dump
 *.log
 local-evidence/

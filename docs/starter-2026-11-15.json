@@ -1,0 +1,86 @@
+{
+  "scope": "Synthetic isolated PostgreSQL 17 and real loopback Uvicorn; Docker not exercised here",
+  "checks": [
+    {
+      "name": "first-use amounts reconcile",
+      "passed": true
+    },
+    {
+      "name": "credentials excluded from result",
+      "passed": true
+    },
+    {
+      "name": "rerun is byte-identical",
+      "passed": true
+    },
+    {
+      "name": "independent SQL units and microUSD",
+      "passed": true
+    },
+    {
+      "name": "only two immutable revisions",
+      "passed": true
+    },
+    {
+      "name": "expired sandbox stops explicitly",
+      "passed": true
+    },
+    {
+      "name": "expired rerun preserves last complete export",
+      "passed": true
+    },
+    {
+      "name": "source bytes unchanged during the exercise",
+      "passed": true
+    }
+  ],
+  "source_files": {
+    "analytics.py": "ea1e05225b5a63a13c2f68c17fcc211ee2bf8704b8baa0bd3a4a7b765eb49a2d",
+    "app.py": "ebcb3d036c3ada8eeafc0854bae87bf1097209f2f2b3886deef9b14d4cf049de",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "bootstrap_runtime.py": "cd4d0e484ae491acd2222278da9120b6bea5b4596ca34af8874380d5d85d2746",
+    "demo.py": "0c7fe8d1dffbb068f6138bb896306843bf27fc227b1bc86fa50a2461be6cd091",
+    "export_snapshot.py": "e31da3eda608b89013f388b4fbb8f1bab8d06c5d52dbe95471ca64643c50bcaa",
+    "finance_export.py": "3fdaa0cdf587ba5148323d504316c4d5162cd050facd0ecf1361ec87a803a425",
+    "rate_limits.py": "49aed5c9673ed6938d9893ac0452f8ebd47302457af518ce85602a21a1a7afa5",
+    "runtime_schema.sql": "4c6834c19f9e93451b9528e2628adc34123c3d51144fb1164062d0624d4de1b3",
+    "runtime_store.py": "a32d035bd5d5e4feb7837ae3166391df681c192a83604c9b3d9b2ef85331006a",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "starter/__init__.py": "50961facbf05483357e88abad378645537599aa0b5ee75572221628605558ef7",
+    "starter/client.py": "f0ccb96772a0ee5cf6d0555dc230a9ee8febda1d3066839c2d90ec268dc4efd3",
+    "starter/local.py": "c8a81dd9539515047624fb756e427981d5ea78200b5373ac7f9d1423f6566261",
+    "starter/package.py": "d8b1a8456b3d35059ca36d49d0c9ee75534424fa7fb731f9666766aa5a7719dc",
+    "starter/private.py": "5382bcfee757d865b18b246e6c61b9a56dca3cd6849f45348150d793669e4bd7",
+    "starter/verify.py": "daa0dc5b9f15eff57b74e6668673b8acbd38b0eb6e219149e2cc22bd3b4255f3",
+    "statement_diff.py": "db8cbc731e6e1d1658a9cbe3e55151adf468e34cd76b4bdab527c9499286e093",
+    "store.py": "8ee29603e1278f682a6c1722da527afa734d784e6d18bfd6cbac4cfde6b4140d",
+    "verify_finance_export.py": "ff2b3ee4b9c536f167648287e2b3eb2e8bacb819604107b465a12fd598f31406",
+    "verify_http.py": "98131ed05af83c7a009fd4e19b3b7f5347b879fde24f0cf8f028e4cc7fd79d3b",
+    "verify_multiworker.py": "a5c3a062369846dba801c0f3e154a5609c9c560d4f1c5367b0967d6cd41d4691",
+    "verify_release.py": "83d9eb9f0020186535b0cb2f5054a9e409b1b4c0ffaeeb038dde5fdd987b41f8",
+    "verify_request_recovery.py": "1e6bebde89bab46601a8d87bf8d9ded09d83e77a9efbbd543c24fc500048a110",
+    "verify_runtime.py": "6ea9a2f11dc48e765fccc496ee2fffe763ca26ee21c7978530d782d377c1e0ce",
+    "verify_runtime_restore.py": "0fee1814e9e048430a2b8b8a97669dc0063c5c4ca3271d3c1360f3e563d80528",
+    "verify_workload.py": "6a1f3461f1cd74d0686217ea92d8d73226db370b630bead97f57a68f530f5fff"
+  },
+  "generated_at": "2026-11-15T23:27:33.258840+00:00",
+  "source_commit": "local-uncommitted",
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "postgresql": "17.11",
+  "reconciliation": {
+    "original_units": 12000,
+    "correction_units": -2000,
+    "final_units": 10000,
+    "unit_price_microusd": 250,
+    "old_amount_microusd": 3000000,
+    "new_amount_microusd": 2500000,
+    "delta_amount_microusd": -500000,
+    "old_usd": "3.00",
+    "new_usd": "2.50",
+    "delta_usd": "-0.50",
+    "accepted_events": 2,
+    "statement_revisions": 2,
+    "exact_replay_accepted": false
+  }
+}

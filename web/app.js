@@ -244,12 +244,12 @@ if (snapshotMode) {
   document.querySelector('.scope-note .tag').textContent = 'DATED SYNTHETIC SNAPSHOT';
   document.querySelector('.scope-note p').textContent = 'Read-only evidence. No live backend is connected. No customer traffic or money collected.';
   text('data-state', 'Loading the published snapshot');
-  const apiLink = document.querySelector('.topbar > .text-link'); apiLink.href = `${repository}#run-locally`; apiLink.textContent = 'Run locally ↗';
+  const apiLink = document.querySelector('.topbar > .text-link'); apiLink.href = './start/'; apiLink.textContent = 'Run locally ↗';
   $('refresh').hidden = true;
   document.querySelector('.demo-panel').hidden = true;
   const panel = node('aside', null, 'panel snapshot-panel');
   panel.append(node('span', 'READ-ONLY PREVIEW', 'small-label'), node('h2', 'Inspect it here. Run it locally.'), node('p', 'These figures are exported from a real execution against synthetic fixtures. They are a dated snapshot, not a live service or a claim of customer adoption.', 'body-copy'));
-  const link = node('a', 'Run the sandbox and failure exercises ↗', 'button primary'); link.href = `${repository}#run-locally`; link.target = '_blank'; link.rel = 'noopener'; panel.append(link);
+  const link = node('a', 'Start the local integration guide ↗', 'button primary'); link.href = './start/'; panel.append(link);
   panel.append(node('p', 'The repository includes PostgreSQL row-level security, immutable statement revisions, bounded retries and a separate assignment/exposure event flow. The full console calls the real API when run locally.', 'caption'));
   document.querySelector('.console-grid').append(panel);
   $('issue-statement').closest('.toolbar').hidden = true;
