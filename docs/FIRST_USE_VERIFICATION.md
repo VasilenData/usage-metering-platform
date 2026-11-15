@@ -4,8 +4,8 @@ Observed on Windows 11, Python 3.12.14 and PostgreSQL 17.11 in a newly initializ
 
 | Check | Observed result |
 |---|---|
-| Final `pytest -q` | **201 passed, 2 skipped**, 80.59 seconds |
-| Starter tests (included above) | **35 passed, 2 skipped** |
+| Final full `pytest -q` after both portability fixes | **205 passed, 2 skipped**, 73.05 seconds |
+| Final starter tests, including ZIP platform regression | **39 passed, 2 skipped** |
 | Real starter HTTP + SQL exercise | **8 checks passed** |
 | Browser SDK and reconciliation tests | **10 passed** |
 | Ruff lint / formatting / JS syntax / Git whitespace | Passed |
@@ -20,6 +20,8 @@ Observed on Windows 11, Python 3.12.14 and PostgreSQL 17.11 in a newly initializ
 | Existing database-contention recovery | 17 checks; 14 HTTP requests |
 
 The two skips are explicit platform limits: this Windows account cannot create a symlink for the symlink-path test, and POSIX mode enforcement is tested on POSIX only. Windows file ACL creation was exercised. The suite emitted one existing Starlette/httpx deprecation warning; no dependency was changed to suppress it.
+
+The [first Linux CI run](https://github.com/VasilenData/usage-metering-platform/actions/runs/43774484018) found two portability defects that local Windows execution could not establish: an immediate connection reset while the newly started container initialized Uvicorn, and ZIP central-directory metadata that differed by authoring OS. The readiness probe now retries transport resets within the existing 90-attempt limit (two-second request timeout, one-second spacing); regression tests cover recovery and exhausted bounds. ZIP entries now set an explicit host OS and file mode, with a Windows/Linux metadata regression while preserving the strict byte-for-byte archive test. The final full and targeted suites cover both fixes. The final-head Linux CI run must establish the Compose outcome.
 
 The [new raw starter receipt](starter-2026-11-15.json) fingerprints every core Python/SQL source and every starter Python module. It was generated before committing, so its source commit is honestly `local-uncommitted`; the hashes identify the exact code. CI recreates the receipt with `GITHUB_SHA`. The checks establish:
 

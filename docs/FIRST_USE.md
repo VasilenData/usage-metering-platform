@@ -64,6 +64,6 @@ Only to intentionally erase **all local Meterwork database data** for this check
 
 ## Verification
 
-[Observed local results and explicit platform limits](FIRST_USE_VERIFICATION.md): 201 Python tests passed, two platform skips, eight real HTTP/SQL starter checks, and all existing integration gates passed. Docker was unavailable locally; Compose is a separate required CI job.
+[Observed local results and explicit platform limits](FIRST_USE_VERIFICATION.md): 205 Python tests passed with two platform skips, including container-startup resets and deterministic ZIP metadata. Eight real HTTP/SQL starter checks and all existing integration gates passed. Docker was unavailable locally; Compose is a separate required CI job.
 
 `pytest -q tests/test_starter.py` covers setup/errors/permissions/paths/retries/export invariants without Docker. `python -m starter.verify` uses an isolated disposable PostgreSQL database and real loopback Uvicorn with `TEST_DATABASE_URL` ending in `_test`. It checks first execution, exact rerun and independent SQL. The dedicated `compose-first-use` CI job exercises full Compose setup, repeated setup, run/rerun, stop/start and backup. Historical reports stay pinned to their measured sources.
