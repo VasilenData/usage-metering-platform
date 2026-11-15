@@ -93,7 +93,14 @@ class RuntimeStore(Store):
                     raise ValueError("Run the explicit administrative bootstrap before starting HTTP")
 
     def connection(self):
-        return psycopg.connect(self.runtime_url, row_factory=dict_row, connect_timeout=10)
+        # Apply the budget at connection startup, including provisioning, health
+        # and privilege inspection. Per-method SET LOCAL left those paths unbounded.
+        return psycopg.connect(
+            self.runtime_url,
+            row_factory=dict_row,
+            connect_timeout=10,
+            options="-c statement_timeout=5000 -c lock_timeout=2000",
+        )
 
     def admin(self):
         raise PermissionError("Administrative operations are unavailable to the HTTP runtime")

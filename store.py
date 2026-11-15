@@ -1,6 +1,7 @@
 """PostgreSQL storage, bounded demo lifecycle, immutable tenant-scoped data."""
 
 import hashlib
+import re
 import secrets
 import uuid
 from contextlib import contextmanager
@@ -169,6 +170,11 @@ class Store:
         body = dict(body)
         body["occurred_at"] = timestamp(body["occurred_at"])
         body.setdefault("correction_of", None)
+        reference = body["correction_of"]
+        if reference is not None and (
+            not isinstance(reference, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,96}", reference)
+        ):
+            raise ValueError("correction_of must be null or a nonempty event identifier")
         if type(body["units"]) is not int or not -100000 <= body["units"] <= 100000 or body["units"] == 0:
             raise ValueError("Units must be a non-zero integer bounded by 100,000")
         payload_hash = digest(body)

@@ -59,7 +59,9 @@ class Usage(StrictModel):
     source: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.:/-]+$")
     occurred_at: AwareDatetime
     units: StrictInt = Field(ge=-100000, le=100000)
-    correction_of: str | None = Field(default=None, max_length=96)
+    correction_of: str | None = Field(
+        default=None, min_length=1, max_length=96, pattern=r"^[A-Za-z0-9_.:-]+$"
+    )
 
     @field_validator("occurred_at")
     @classmethod
@@ -150,7 +152,9 @@ async def protections(request: Request, call_next):
             "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"
         )
         response.headers["Cache-Control"] = (
-            "no-store" if request.url.path.startswith("/api/") else "public, max-age=60"
+            "no-store"
+            if request.url.path.startswith("/api/") or response.status_code >= 400
+            else "public, max-age=60"
         )
         response.headers["Server-Timing"] = f"app;dur={(time.perf_counter() - started) * 1000:.2f}"
         return response
@@ -223,7 +227,18 @@ async def protections(request: Request, call_next):
             )
         request.state.identity = tenant
         request.state.runtime = store.scoped(token) if tenant else None
-    return protected(await call_next(request))
+    try:
+        return protected(await call_next(request))
+    except TEMPORARY_DATABASE_ERRORS:
+        # A lost database response can follow a commit. Do not imply rollback or
+        # replay a write automatically; callers must preserve its event identity.
+        return protected(
+            JSONResponse(
+                {"detail": "Database operation temporarily unavailable", "outcome": "unknown"},
+                503,
+                headers={"Retry-After": "2"},
+            )
+        )
 
 
 @app.exception_handler(ValueError)

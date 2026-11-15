@@ -64,6 +64,8 @@ jobs:
         run: python verify_multiworker.py --phase-seconds 10 --output local-evidence/multiworker-ci.json
       - name: Export immutable usage-to-finance source bundles through the restricted runtime
         run: python verify_finance_export.py --output local-evidence/finance-export-ci
+      - name: Observe bounded database contention and exact HTTP retry recovery
+        run: python verify_request_recovery.py --output local-evidence/request-recovery-ci.json
       - name: Fetch source for earlier HTTP evidence
         uses: actions/checkout@v4
         with:
@@ -79,6 +81,11 @@ jobs:
         with:
           ref: 3ed2a6fce0a7fc2883789edd57cd919dc5e6b274
           path: runtime-restore-evidence-source
+      - name: Fetch source for the unchanged published workload and finance evidence
+        uses: actions/checkout@v4
+        with:
+          ref: ae0fb03000cee395047f1a90e7186950dd6a6b9f
+          path: published-evidence-source
       - name: Verify fresh and historical evidence against their own source
         run: |
           python - <<'PY'
@@ -97,8 +104,10 @@ jobs:
               ('local-evidence/runtime-ci.json', Path('.')),
               ('local-evidence/runtime-restore-ci.json', Path('.')),
               ('local-evidence/multiworker-ci.json', Path('.')),
+              ('local-evidence/request-recovery-ci.json', Path('.')),
+              ('docs/request-recovery-2026-11-15.json', Path('.')),
               ('local-evidence/finance-export-ci/report.json', Path('.')),
-              ('web/finance-bridge/report.json', Path('.')),
+              ('web/finance-bridge/report.json', Path('published-evidence-source')),
           ]:
               report = json.loads(Path(filename).read_text())
               assert report['checks'] and all(row['passed'] for row in report['checks'])
@@ -107,7 +116,7 @@ jobs:
           workload = json.loads(Path('web/landmark.json').read_text())
           assert workload['checks'] and all(row['passed'] for row in workload['checks'])
           for name, expected in workload['source_files'].items():
-              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+              assert hashlib.sha256((Path('published-evidence-source') / name).read_bytes()).hexdigest() == expected, name
           PY
       - uses: actions/setup-node@v4
         with:
@@ -126,6 +135,7 @@ jobs:
             local-evidence/runtime-ci.json
             local-evidence/runtime-restore-ci.json
             local-evidence/multiworker-ci.json
+            local-evidence/request-recovery-ci.json
             local-evidence/finance-export-ci/
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
