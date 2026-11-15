@@ -9,13 +9,19 @@ FILES = ["__init__.py", "private.py", "local.py", "client.py", "sample.json", "R
 
 
 def archive():
+    def entry(name):
+        info = zipfile.ZipInfo(name, (2026, 11, 15, 0, 0, 0))
+        # ZipInfo otherwise embeds the author's OS in the central directory.
+        info.create_system = 3
+        info.external_attr = 0o100644 << 16
+        return info
+
     output = io.BytesIO()
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as bundle:
         for name in FILES:
-            info = zipfile.ZipInfo("starter/" + name, (2026, 11, 15, 0, 0, 0))
-            bundle.writestr(info, (ROOT / "starter" / name).read_bytes())
+            bundle.writestr(entry("starter/" + name), (ROOT / "starter" / name).read_bytes())
         bundle.writestr(
-            zipfile.ZipInfo("docs/FIRST_USE.md", (2026, 11, 15, 0, 0, 0)),
+            entry("docs/FIRST_USE.md"),
             (ROOT / "docs/FIRST_USE.md").read_bytes(),
         )
     return output.getvalue()

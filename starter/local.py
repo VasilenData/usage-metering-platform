@@ -1,6 +1,7 @@
 """Safe local Compose setup; run from a full Meterwork checkout."""
 
 import argparse
+import http.client
 import os
 import re
 import secrets
@@ -149,7 +150,7 @@ def compose(action):
                     if response.status == 200:
                         print("Ready: http://127.0.0.1:8000 — run python -m starter.client")
                         return
-            except (urllib.error.URLError, TimeoutError):
+            except (urllib.error.URLError, TimeoutError, OSError, http.client.HTTPException):
                 pass
             time.sleep(1)
         raise StarterError(
