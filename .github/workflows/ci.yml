@@ -62,6 +62,8 @@ jobs:
         run: git fetch --no-tags origin d4a9d852ea2bfe7c28589daea9a5a946f07279bf
       - name: Exercise shared admission, response loss and sustained two-worker load
         run: python verify_multiworker.py --phase-seconds 10 --output local-evidence/multiworker-ci.json
+      - name: Export immutable usage-to-finance source bundles through the restricted runtime
+        run: python verify_finance_export.py --output local-evidence/finance-export-ci
       - name: Fetch source for earlier HTTP evidence
         uses: actions/checkout@v4
         with:
@@ -95,6 +97,8 @@ jobs:
               ('local-evidence/runtime-ci.json', Path('.')),
               ('local-evidence/runtime-restore-ci.json', Path('.')),
               ('local-evidence/multiworker-ci.json', Path('.')),
+              ('local-evidence/finance-export-ci/report.json', Path('.')),
+              ('web/finance-bridge/report.json', Path('.')),
           ]:
               report = json.loads(Path(filename).read_text())
               assert report['checks'] and all(row['passed'] for row in report['checks'])
@@ -122,6 +126,7 @@ jobs:
             local-evidence/runtime-ci.json
             local-evidence/runtime-restore-ci.json
             local-evidence/multiworker-ci.json
+            local-evidence/finance-export-ci/
   publish-snapshot:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
