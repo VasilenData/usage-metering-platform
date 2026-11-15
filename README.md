@@ -55,6 +55,15 @@ Python 3.12, FastAPI, PostgreSQL 17+, plain JavaScript ES modules, pytest, Hypot
 
 ## Run locally
 
+**New here? [Follow the first-use guide](https://vasilendata.github.io/usage-metering-platform/start/)** to create local credentials, launch Compose, send/replay/correct an event and export a reconciled USD 3.00 → 2.50 statement. [Installation and recovery instructions](docs/FIRST_USE.md) cover diagnostics, reruns, stop/start, backups and upgrades. Python 3.12+ and Docker Compose v2; local computation, no hosted backend or cloud account.
+
+```sh
+python -m starter.local doctor
+python -m starter.local setup
+python -m starter.local up
+python -m starter.client
+```
+
 Set separate URL-safe local development `POSTGRES_PASSWORD` and `METER_RUNTIME_PASSWORD` values (the runtime password must be at least 24 characters), then run `docker compose up --build`. Open `http://localhost:8000`. Compose runs an explicit administrative bootstrap job before starting the application. Only the bootstrap receives the administrative DSN; the app receives `METER_RUNTIME_DATABASE_URL` for `meter_api_runtime`. PostgreSQL stays on the private Compose network and only the app binds to loopback.
 
 For a manual installation, run `python bootstrap_runtime.py` in a separate administrative process with `ADMIN_DATABASE_URL` and `METER_RUNTIME_PASSWORD`. Start a clean shell containing only `METER_RUNTIME_DATABASE_URL`, then use `uvicorn app:app --host 127.0.0.1 --port 8000 --no-proxy-headers --no-access-log`. The HTTP process rejects administrative/test DSN environment variables and unsafe PostgreSQL identities. Multiple workers share PostgreSQL admission windows; read the [migration and measured limits](docs/MULTIWORKER.md) before changing worker count. See [credential boundaries and reproduction](docs/RUNTIME_SECURITY.md) before adapting the launch configuration. Use a dedicated demonstration database; no credentials belong in this repository.

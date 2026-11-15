@@ -5,4 +5,5 @@ __pycache__
 .hypothesis
 .ruff_cache
 .env
+.meterwork
 local-evidence
