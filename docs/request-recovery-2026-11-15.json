@@ -1,0 +1,222 @@
+{
+  "generated_at": "2026-11-15T15:28:28.496796+00:00",
+  "scope": "Synthetic loopback HTTP and deliberately held PostgreSQL locks in an isolated test database",
+  "source_commit": "local-uncommitted",
+  "ci_run_id": null,
+  "platform": "Windows-11-10.0.26300-SP0",
+  "checks": [
+    {
+      "name": "All runtime connections start with SQL budgets",
+      "passed": true,
+      "detail": {
+        "statement_timeout": "5s",
+        "lock_timeout": "2s"
+      }
+    },
+    {
+      "name": "Two disposable accounts provision",
+      "passed": true,
+      "detail": "Real restricted API"
+    },
+    {
+      "name": "Empty correction reference is a client error",
+      "passed": true,
+      "detail": "Previously returned HTTP 500"
+    },
+    {
+      "name": "Invalid request wrote no ledger event",
+      "passed": true,
+      "detail": {
+        "rows": 0
+      }
+    },
+    {
+      "name": "Initial statement reconciles",
+      "passed": true,
+      "detail": "11 units at 250 microUSD"
+    },
+    {
+      "name": "Write and publication waits independently observed",
+      "passed": true,
+      "detail": [
+        {
+          "wait_type": "Lock",
+          "wait_event": "advisory"
+        },
+        {
+          "wait_type": "Lock",
+          "wait_event": "advisory"
+        }
+      ]
+    },
+    {
+      "name": "Another account proceeds during A's lock",
+      "passed": true,
+      "detail": "No global tenant lock"
+    },
+    {
+      "name": "Locked write returns protected 503",
+      "passed": true,
+      "detail": "No raw database details; outcome unknown; Retry-After 2"
+    },
+    {
+      "name": "Locked publication returns protected 503",
+      "passed": true,
+      "detail": "No raw database details; outcome unknown; Retry-After 2"
+    },
+    {
+      "name": "Timeout leaves prior ledger and statement intact",
+      "passed": true,
+      "detail": "Observed while the independent blocker still held the lock"
+    },
+    {
+      "name": "Same-identity retry accepts once",
+      "passed": true,
+      "detail": "No new identity invented after the failed response"
+    },
+    {
+      "name": "Recovered publication independently reconciles",
+      "passed": true,
+      "detail": "(11+7) \u00d7 250 = 4500 microUSD; previous revision retained"
+    },
+    {
+      "name": "Provisioning lock wait independently observed",
+      "passed": true,
+      "detail": [
+        {
+          "wait_type": "Lock",
+          "wait_event": "advisory"
+        }
+      ]
+    },
+    {
+      "name": "Sandbox provisioning is bounded and protected",
+      "passed": true,
+      "detail": "The former unbounded runtime path now obeys the connection lock budget"
+    },
+    {
+      "name": "Refused provisioning creates no account",
+      "passed": true,
+      "detail": {
+        "before": 3,
+        "after": 3
+      }
+    },
+    {
+      "name": "Provisioning recovers after the lock is released",
+      "passed": true,
+      "detail": "One deliberate new sandbox request, no automatic retry"
+    },
+    {
+      "name": "Health remains available after recovery",
+      "passed": true,
+      "detail": "Actual HTTP health route"
+    }
+  ],
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/sandbox",
+      "status": 201,
+      "elapsed_ms": 159.81
+    },
+    {
+      "method": "POST",
+      "path": "/api/sandbox",
+      "status": 201,
+      "elapsed_ms": 52.85
+    },
+    {
+      "method": "POST",
+      "path": "/api/usage",
+      "status": 422,
+      "elapsed_ms": 53.823
+    },
+    {
+      "method": "POST",
+      "path": "/api/usage",
+      "status": 200,
+      "elapsed_ms": 78.16
+    },
+    {
+      "method": "POST",
+      "path": "/api/statements",
+      "status": 200,
+      "elapsed_ms": 291.7
+    },
+    {
+      "method": "POST",
+      "path": "/api/usage",
+      "status": 200,
+      "elapsed_ms": 81.521
+    },
+    {
+      "method": "POST",
+      "path": "/api/statements",
+      "status": 503,
+      "elapsed_ms": 2090.465
+    },
+    {
+      "method": "POST",
+      "path": "/api/usage",
+      "status": 503,
+      "elapsed_ms": 2200.474
+    },
+    {
+      "method": "POST",
+      "path": "/api/usage",
+      "status": 200,
+      "elapsed_ms": 190.519
+    },
+    {
+      "method": "POST",
+      "path": "/api/usage",
+      "status": 200,
+      "elapsed_ms": 126.829
+    },
+    {
+      "method": "POST",
+      "path": "/api/statements",
+      "status": 200,
+      "elapsed_ms": 104.403
+    },
+    {
+      "method": "POST",
+      "path": "/api/sandbox",
+      "status": 503,
+      "elapsed_ms": 2073.401
+    },
+    {
+      "method": "POST",
+      "path": "/api/sandbox",
+      "status": 201,
+      "elapsed_ms": 179.21
+    },
+    {
+      "method": "GET",
+      "path": "/healthz",
+      "status": 200,
+      "elapsed_ms": 26.455
+    }
+  ],
+  "limits": [
+    "One Uvicorn process and one PostgreSQL node; not production availability or a load benchmark",
+    "Lock failures in this exercise precede the writes; a general failed response can follow a commit",
+    "Statement and lock budgets are per SQL operation, not a total HTTP deadline",
+    "Synthetic AI-assisted verification; not customer traffic or independent human review"
+  ],
+  "source_files": {
+    "app.py": "ebcb3d036c3ada8eeafc0854bae87bf1097209f2f2b3886deef9b14d4cf049de",
+    "runtime_store.py": "a32d035bd5d5e4feb7837ae3166391df681c192a83604c9b3d9b2ef85331006a",
+    "store.py": "8ee29603e1278f682a6c1722da527afa734d784e6d18bfd6cbac4cfde6b4140d",
+    "runtime_schema.sql": "4c6834c19f9e93451b9528e2628adc34123c3d51144fb1164062d0624d4de1b3",
+    "schema.sql": "e46e77798c2eaae2c6c3c1b8cbbebd4af79b03c1cfc41e5d1139285efcf530b9",
+    "bootstrap_runtime.py": "cd4d0e484ae491acd2222278da9120b6bea5b4596ca34af8874380d5d85d2746",
+    "billing.py": "f6e67ffecaac3cd8b553d9a2ac322e8c219a7712868fb76f6d827867e6cfde66",
+    "rate_limits.py": "49aed5c9673ed6938d9893ac0452f8ebd47302457af518ce85602a21a1a7afa5",
+    "verify_http.py": "98131ed05af83c7a009fd4e19b3b7f5347b879fde24f0cf8f028e4cc7fd79d3b",
+    "verify_runtime_restore.py": "0fee1814e9e048430a2b8b8a97669dc0063c5c4ca3271d3c1360f3e563d80528",
+    "verify_request_recovery.py": "1e6bebde89bab46601a8d87bf8d9ded09d83e77a9efbbd543c24fc500048a110",
+    "requirements.txt": "c46402cb9cce4e53643c99f8875f51163d91f9dafb0e796cd3079906de5761a6"
+  }
+}
