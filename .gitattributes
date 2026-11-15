@@ -1,0 +1,4 @@
+# Source fingerprints are portable across Windows and Unix checkouts.
+* text=auto eol=lf
+# Evidence and source bundles are byte-addressed: preserve their exact Git bytes.
+*.json -text

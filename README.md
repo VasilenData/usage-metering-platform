@@ -14,6 +14,8 @@ A per-process quota let one account double its allowance across two API workers.
 
 **Usage → finance:** exported actual restricted-API statement revisions and source histories into a separate USD reconciliation scenario. Exact replay kept all bundle bytes unchanged; a late correction preserved the previous revision and explained both the **-150-cent invoice change** and **+1,500-microUSD rounding residual change**. The local PostgreSQL/HTTP export exercise passed **14 checks**. [View the correction](https://vasilendata.github.io/usage-metering-platform/finance-bridge/) · [Inspect the contract and scope](docs/FINANCE_BRIDGE.md).
 
+**A contended database, a recoverable request:** fixed a malformed correction that returned HTTP 500 and bounded previously unbounded runtime SQL paths. Real locked writes, publication and sandbox provisioning now return protected 503s; the old statement survives and a same-ID retry reconciles exactly once. A separate synthetic local exercise passes **17 checks over 14 HTTP requests**. [Inspect the observed failure and recovery](docs/REQUEST_RECOVERY.md).
+
 ## What to inspect
 
 | Question | Evidence |
@@ -29,7 +31,7 @@ A per-process quota let one account double its allowance across two API workers.
 | Can the current restricted API restart after restoration? | [Fresh-database runtime recovery](docs/RUNTIME_RESTORE.md): closed admission, repaired function ownership/ACLs, complete data fingerprints, real HTTP replay and account-denial checks, then a second process restart. |
 | Does product data justify a launch? | Instrumented browser SDK, assignment/exposure checks, ordered funnel, mature retention cohorts and fixed-horizon decision gates. |
 
-**Latest runtime evidence:** [126 Python tests and 27 runtime acceptance checks](docs/RUNTIME_SECURITY.md#observed-result--13-november-2026), with separate 363-request fairness and 345-request HTTP regression exercises on synthetic GitHub-hosted PostgreSQL.
+**Earlier runtime evidence (13 November):** [126 Python tests and 27 runtime acceptance checks](docs/RUNTIME_SECURITY.md#observed-result--13-november-2026), with separate 363-request fairness and 345-request HTTP regression exercises on synthetic GitHub-hosted PostgreSQL.
 
 **Inspect the engineering:** [contract](docs/CONTRACT.md), [product definitions](docs/PRODUCT_ANALYTICS.md), [delivery prompt and primary references](docs/DELIVERY_PROMPT.md), [dated recovery evidence](docs/release-2026-11-12.json), and [CI](https://github.com/VasilenData/usage-metering-platform/actions).
 
@@ -75,6 +77,7 @@ python verify_runtime.py --output local-evidence/runtime.json
 python verify_runtime_restore.py --output local-evidence/runtime-restore.json
 python verify_multiworker.py --phase-seconds 10 --output local-evidence/multiworker.json
 python verify_finance_export.py --output local-evidence/finance-export-ci
+python verify_request_recovery.py --output local-evidence/request-recovery.json
 ```
 
 The integration suite requires PostgreSQL and fails when its test database is absent. The release exercise also needs matching-version `pg_dump`/`pg_restore` in PATH, or `--pg-bin /path/to/postgresql/bin`. It creates and drops only a uniquely named disposable restore database. Keep generated dumps private; even this synthetic demonstration has hashed sandbox tokens.
