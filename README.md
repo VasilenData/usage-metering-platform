@@ -10,6 +10,8 @@ An API business needs to explain a usage statement when requests are retried, ar
 
 A per-process quota let one account double its allowance across two API workers. I replaced it with bounded PostgreSQL admission state behind a restricted function, then killed a worker after an independently observed commit and retried through its survivor. The synthetic local exercise passed **32 checks**; a separate 30-second mixed load completed **350 requests with no HTTP errors** across two workers (p95 **199 ms**). [Inspect the measured result, failure proof and limitations](docs/MULTIWORKER.md) · [Raw evidence](docs/multiworker-2026-11-14.json).
 
+**Usage → finance:** exported actual restricted-API statement revisions and source histories into a separate USD reconciliation scenario. Exact replay kept all bundle bytes unchanged; a late correction preserved the previous revision and explained both the **-150-cent invoice change** and **+1,500-microUSD rounding residual change**. The local PostgreSQL/HTTP export exercise passed **14 checks**. [View the correction](https://vasilendata.github.io/usage-metering-platform/finance-bridge/) · [Inspect the contract and scope](docs/FINANCE_BRIDGE.md).
+
 ## What to inspect
 
 | Question | Evidence |
@@ -70,6 +72,7 @@ python verify_http.py --output local-evidence/http.json
 python verify_runtime.py --output local-evidence/runtime.json
 python verify_runtime_restore.py --output local-evidence/runtime-restore.json
 python verify_multiworker.py --phase-seconds 10 --output local-evidence/multiworker.json
+python verify_finance_export.py --output local-evidence/finance-export-ci
 ```
 
 The integration suite requires PostgreSQL and fails when its test database is absent. The release exercise also needs matching-version `pg_dump`/`pg_restore` in PATH, or `--pg-bin /path/to/postgresql/bin`. It creates and drops only a uniquely named disposable restore database. Keep generated dumps private; even this synthetic demonstration has hashed sandbox tokens.
