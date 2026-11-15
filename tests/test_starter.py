@@ -155,6 +155,56 @@ def test_env_override_stops_before_compose(monkeypatch):
     assert "do-not-print" not in str(error.value)
 
 
+@pytest.mark.parametrize(
+    "failure",
+    [ConnectionResetError(104, "Connection reset by peer"), http.client.RemoteDisconnected("API starting")],
+)
+def test_startup_readiness_recovers_from_transport_failure(monkeypatch, failure, capsys):
+    monkeypatch.setattr(local, "doctor", lambda: None)
+    monkeypatch.setattr(local, "credentials", lambda: None)
+    for key in local.KEYS:
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setattr(local.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(returncode=0))
+    attempts, delays = [], []
+
+    def open_request(*args, **kwargs):
+        attempts.append(kwargs["timeout"])
+        if len(attempts) == 1:
+            raise failure
+        response = io.BytesIO(b'{"status":"ok"}')
+        response.status = 200
+        return response
+
+    monkeypatch.setattr(
+        local.urllib.request, "build_opener", lambda *args: SimpleNamespace(open=open_request)
+    )
+    monkeypatch.setattr(local.time, "sleep", delays.append)
+    local.compose("up")
+    assert attempts == [2, 2] and delays == [1]
+    assert "Ready:" in capsys.readouterr().out
+
+
+def test_startup_readiness_remains_bounded_when_resets_continue(monkeypatch):
+    monkeypatch.setattr(local, "doctor", lambda: None)
+    monkeypatch.setattr(local, "credentials", lambda: None)
+    for key in local.KEYS:
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setattr(local.subprocess, "run", lambda *args, **kwargs: SimpleNamespace(returncode=0))
+    attempts, delays = [], []
+
+    def open_request(*args, **kwargs):
+        attempts.append(kwargs["timeout"])
+        raise ConnectionResetError(104, "Connection reset by peer")
+
+    monkeypatch.setattr(
+        local.urllib.request, "build_opener", lambda *args: SimpleNamespace(open=open_request)
+    )
+    monkeypatch.setattr(local.time, "sleep", delays.append)
+    with pytest.raises(private.StarterError, match="did not become healthy"):
+        local.compose("up")
+    assert attempts == [2] * 90 and delays == [1] * 90
+
+
 class Response(io.BytesIO):
     pass
 
@@ -293,3 +343,16 @@ def test_public_download_contains_exact_source_and_no_private_state():
         assert set(bundle.namelist()) == {"docs/FIRST_USE.md", *["starter/" + name for name in FILES]}
     sample = json.loads((root / "web/start/sample.json").read_text())
     assert sample == {"month": "2026-10", "original": client.ORIGINAL, "correction": client.CORRECTION}
+
+
+def test_archive_bytes_do_not_depend_on_zipinfo_host_platform(monkeypatch):
+    with monkeypatch.context() as context:
+        context.setattr(zipfile.sys, "platform", "win32")
+        windows = archive()
+        context.setattr(zipfile.sys, "platform", "linux")
+        linux = archive()
+    assert windows == linux
+    with zipfile.ZipFile(io.BytesIO(windows)) as bundle:
+        assert all(
+            entry.create_system == 3 and entry.external_attr == 0o100644 << 16 for entry in bundle.infolist()
+        )
